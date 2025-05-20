@@ -1,4 +1,4 @@
-# Z80 3d [Amp](https://ampcode.com/) Logo
+# Z80 [Amp](https://ampcode.com/) Intro Video
 
 A quick visual I put together for https://x.com/GeoffreyHuntley/status/1924660488333566393
 
