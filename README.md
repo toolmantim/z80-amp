@@ -1,8 +1,8 @@
-# Z80 Amp Intro Video
+# ZX80 Amp Intro Video
 
 A quick visual I put together for https://x.com/GeoffreyHuntley/status/1924660488333566393
 
-https://toolmantim.github.io/z80-amp/
+https://toolmantim.github.io/zx80-amp/
 
 Press <kbd>G</kbd> to access the GUI.
 
