@@ -4,7 +4,7 @@ A quick visual I put together for https://x.com/GeoffreyHuntley/status/192466048
 
 https://toolmantim.github.io/z80-amp/
 
-Press <kbd>g</kbd> to access the GUI to customize it.
+Press <kbd>G</kbd> to access the GUI.
 
 The various Amp threads used to bring this to life:
 * https://ampcode.com/threads/T-ef2b579c-22c1-4dc7-b1d4-befb8ca2cd67
