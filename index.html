@@ -4,7 +4,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Z80 Amp Logo</title>
+	<title>ZX80 Amp Logo</title>
 	<script type="importmap">
       {
         "imports": {
@@ -310,7 +310,7 @@
 		<div class="border-stripes"></div>
 	</div>
 	<div class="logo-placeholder">AMP</div>
-	<div class="loading-text">LOADING Z80 AMP...</div>
+	<div class="loading-text">LOADING ZX80 AMP...</div>
 	<div class="progress-counter">0%</div>
 	<div class="instructions" style="display: none;">PRESS ENTER TO CONTINUE</div>
 
@@ -417,11 +417,11 @@
 						gl_FragColor.rgb *= 0.8; // Darker grid lines
 					}
 				} else {
-					// Original Z80 green monochrome code
+					// Original ZX80 green monochrome code
 					// First convert to grayscale
 					float brightness = dot(gl_FragColor.rgb, vec3(0.299, 0.587, 0.114));
 					
-					// Z80 displays had very limited brightness levels
+					// ZX80 displays had very limited brightness levels
 					const float levels = 3.0; // Extremely limited number of brightness levels
 					brightness = floor(brightness * levels) / levels;
 					
@@ -614,7 +614,7 @@
 			const composer = new EffectComposer(renderer);
 			composer.addPass(renderScene);
 
-			// Skip bloom pass for more authentic Z80 look
+			// Skip bloom pass for more authentic ZX80 look
 			// composer.addPass(bloomPass);
 
 			// Add pixelation if enabled
@@ -633,10 +633,10 @@
 			// Initially hide the 3D model until Enter is pressed
 			window.svgGroup.visible = false;
 
-			// Setup GUI controls with Z80 style (hidden by default)
+			// Setup GUI controls with ZX80 style (hidden by default)
 			const gui = new GUI({ autoPlace: false, width: 320 });
 			gui.domElement.style.fontFamily = '"VT323", monospace';
-			gui.title('Z80 CONTROL PANEL');
+			gui.title('ZX80 CONTROL PANEL');
 			gui.close();
 
 			// Add GUI to document body but hidden by default
@@ -653,7 +653,7 @@
 				}
 			});
 
-			// Apply Z80 style to GUI
+			// Apply ZX80 style to GUI
 			const guiElement = document.querySelector('.lil-gui');
 			if (guiElement) {
 				setTimeout(() => {
@@ -687,14 +687,14 @@
 			}
 
 			// Create folders for different parameter groups
-			// Remove bloom folder since it's not used in Z80 style
+			// Remove bloom folder since it's not used in ZX80 style
 			// const bloomFolder = gui.addFolder('BLOOM EFFECT');
 			const materialFolder = gui.addFolder('MATERIAL');
 			const animationFolder = gui.addFolder('ANIMATION');
-			const pixelFolder = gui.addFolder('Z80 PIXELATION');
+			const pixelFolder = gui.addFolder('ZX80 PIXELATION');
 			const scanlineFolder = gui.addFolder('SCANLINE EFFECT');
 
-			// Bloom controls removed for Z80 style
+			// Bloom controls removed for ZX80 style
 			// They were causing the white reflections and square outlines
 
 			// Material controls
@@ -763,7 +763,7 @@
 		camera.position.y = -0.2; // Offset slightly to center in the screen
 		camera.updateProjectionMatrix(); // Update after changing FOV
 
-		// Function to create random Z80-style glitch effect
+		// Function to create random ZX80-style glitch effect
 		function applyRandomGlitch() {
 			if (!params.animation.glitchEffect) return;
 
@@ -858,7 +858,7 @@
 			// Stop the loading interval
 			clearInterval(loadingInterval);
 
-			// Switch back to Z80 phosphor green mode but keep the yellow/blue color scheme
+			// Switch back to ZX80 phosphor green mode but keep the yellow/blue color scheme
 			// pixelPass.uniforms.zxMode.value = false; // Keep ZX colors
 
 			// Make the 3D model visible
