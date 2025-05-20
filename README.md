@@ -1,6 +1,6 @@
 # ZX80 Amp Intro Video
 
-A quick visual I put together for https://x.com/GeoffreyHuntley/status/1924660488333566393
+A quick visual I put together for https://x.com/GeoffreyHuntley/status/1924660488333566393 inspired by the [Sinclair ZX Spectrum](https://en.wikipedia.org/wiki/ZX_Spectrum) (one of the first PCs I used)
 
 https://toolmantim.github.io/zx80-amp/
 
