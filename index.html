@@ -948,8 +948,8 @@
 			// Make the 3D model visible
 			window.svgGroup.visible = true;
 			
-			// Set up long press detection on the 3D model
-			setupLongPressOn3DLogo();
+			// Set up the event handlers for showing the GUI
+			setupControlPanelToggle();
 
 			// Keep yellow on blue colors as requested
 			window.svgGroup.traverse((child) => {
@@ -969,8 +969,8 @@
 			// Better position the model
 			window.svgGroup.position.y = 0;
 			
-			// Function to add click/tap detection to the entire document
-			function setupLongPressOn3DLogo() {
+			// Function to set up click/tap detection for the control panel after logo is revealed
+			function setupControlPanelToggle() {
 				// Reference the GUI by variable name from outer scope
 				// Use window to make sure we access the globally defined gui
 				const guiElement = window.ampControlPanel;
@@ -983,40 +983,37 @@
 					}
 				};
 				
-				// Add event listeners to the document body to expand click area
-				document.body.addEventListener('click', (e) => {
-					// Check if the 3D logo is already visible
-					if (window.svgGroup && window.svgGroup.visible) {
-						// Only toggle if we're not clicking on the GUI itself
-						const guiElement = document.querySelector('.lil-gui');
-						// Don't toggle if clicking on the GUI panel
-						if (guiElement && !guiElement.contains(e.target)) {
-							toggleLogoGUI();
-						}
+				// Create handlers for click and touch events
+				const handleClick = (e) => {
+					// Only toggle if we're not clicking on the GUI itself
+					const guiElement = document.querySelector('.lil-gui');
+					// Don't toggle if clicking on the GUI panel
+					if (guiElement && !guiElement.contains(e.target)) {
+						toggleLogoGUI();
 					}
-				});
+				};
 				
-				// Touch events for mobile
-				document.body.addEventListener('touchend', (e) => {
-					// Check if the 3D logo is already visible
-					if (window.svgGroup && window.svgGroup.visible) {
-						// Only toggle if we're not touching the GUI itself
-						const guiElement = document.querySelector('.lil-gui');
+				const handleTouch = (e) => {
+					// Only toggle if we're not touching the GUI itself
+					const guiElement = document.querySelector('.lil-gui');
+					
+					// Use changedTouches for touchend event
+					if (e.changedTouches && e.changedTouches.length > 0) {
+						const touch = e.changedTouches[0];
+						const touchTarget = document.elementFromPoint(touch.clientX, touch.clientY);
 						
-						// Use changedTouches for touchend event
-						if (e.changedTouches && e.changedTouches.length > 0) {
-							const touch = e.changedTouches[0];
-							const touchTarget = document.elementFromPoint(touch.clientX, touch.clientY);
-							
-							// Don't toggle if touching the GUI panel
-							if (guiElement && !guiElement.contains(touchTarget)) {
-								toggleLogoGUI();
-								// Prevent default only when we handle the event
-								e.preventDefault();
-							}
+						// Don't toggle if touching the GUI panel
+						if (guiElement && !guiElement.contains(touchTarget)) {
+							toggleLogoGUI();
+							// Prevent default only when we handle the event
+							e.preventDefault();
 						}
 					}
-				});
+				};
+				
+				// Add event listeners to the document body
+				document.body.addEventListener('click', handleClick);
+				document.body.addEventListener('touchend', handleTouch);
 			}
 
 			// Add some camera animation
@@ -1052,13 +1049,19 @@
 			}
 		});
 		
-		// Add touch event for mobile devices
-		document.addEventListener('touchstart', () => {
-			// Only trigger if loading is complete (instructions are visible)
-			if (document.querySelector('.instructions').style.display === 'block') {
-				revealLogo();
-			}
-		});
+		// Add touch event for mobile devices - only for initial reveal
+		// Using touchend so it's consistent with the GUI toggle event
+		document.addEventListener('touchend', (e) => {
+		// Only trigger if loading is complete (instructions are visible)
+		if (document.querySelector('.instructions').style.display === 'block' && 
+		(!window.svgGroup || !window.svgGroup.visible)) {
+		 revealLogo();
+		  // Prevent default to avoid any conflicts
+			e.preventDefault();
+		}
+	});
+	
+
 
 		function animate() {
 			if (window.svgGroup) {
