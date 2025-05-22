@@ -312,7 +312,7 @@
 	<div class="logo-placeholder">AMP</div>
 	<div class="loading-text">LOADING ZX80 AMP...</div>
 	<div class="progress-counter">0%</div>
-	<div class="instructions" style="display: none;">PRESS ENTER TO CONTINUE</div>
+	<div class="instructions" style="display: none;"><span class="desktop-instructions">PRESS ENTER TO CONTINUE</span><span class="mobile-instructions" style="display: none;">TAP TO CONTINUE</span></div>
 
 
 	<script type="module">
@@ -981,9 +981,30 @@
 			// document.querySelector('.lil-gui').style.display = 'block';
 		}
 
-		// Add event listener for Enter key
+		// Check if device is touch-enabled
+		const isTouchDevice = 'ontouchstart' in window;
+		
+		// Show appropriate instructions based on device type
+		if (isTouchDevice) {
+			const desktopInstructions = document.querySelector('.desktop-instructions');
+			const mobileInstructions = document.querySelector('.mobile-instructions');
+			if (desktopInstructions && mobileInstructions) {
+				desktopInstructions.style.display = 'none';
+				mobileInstructions.style.display = 'inline';
+			}
+		}
+
+		// Add event listeners for both Enter key and touch
 		document.addEventListener('keydown', (event) => {
 			if (event.key === 'Enter') {
+				revealLogo();
+			}
+		});
+		
+		// Add touch event for mobile devices
+		document.addEventListener('touchstart', () => {
+			// Only trigger if loading is complete (instructions are visible)
+			if (document.querySelector('.instructions').style.display === 'block') {
 				revealLogo();
 			}
 		});
