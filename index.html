@@ -327,7 +327,12 @@
 		import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-		// Initialize CSS variables for logo colors
+		// Define top-level variables instead of using window properties
+	let globalComposer;
+	let globalSvgGroup;
+	let ampControlPanel;
+
+	// Initialize CSS variables for logo colors
 		document.documentElement.style.setProperty('--logo-fg-color', '#ffff00'); // Default yellow
 		document.documentElement.style.setProperty('--logo-bg-color', '#0000ff'); // Default blue
 
@@ -649,6 +654,8 @@
 			// Create composer with the passes
 			const composer = new EffectComposer(renderer);
 			composer.addPass(renderScene);
+			  // Assign to global variable
+			  globalComposer = composer;
 
 			// Skip bloom pass for more authentic ZX80 look
 			// composer.addPass(bloomPass);
@@ -660,14 +667,14 @@
 
 			composer.addPass(outputPass);
 
-			// Store composer in window so we can access it in animate function
-			window.composer = composer;
+			// Store composer so we can access it in animate function
+			globalComposer = composer;
 
 			// Set rotation for animation
-			window.svgGroup = rotationGroup;
+			globalSvgGroup = rotationGroup;
 
 			// Initially hide the 3D model until Enter is pressed
-			window.svgGroup.visible = false;
+			globalSvgGroup.visible = false;
 
 			// Setup GUI controls with ZX80 style (hidden by default)
 			const gui = new GUI({ autoPlace: false, width: 320 });
@@ -683,7 +690,7 @@
 			gui.domElement.style.display = 'none';
 
 			// Store GUI in a global variable for access from 3D logo interaction
-			window.ampControlPanel = gui;
+			ampControlPanel = gui;
 
 			// Apply ZX80 style to GUI
 			const guiElement = document.querySelector('.lil-gui');
@@ -859,7 +866,7 @@
 				);
 
 				// Apply to materials
-				window.svgGroup.traverse((child) => {
+				globalSvgGroup.traverse((child) => {
 					if (child.isMesh) {
 						child.material.emissive.set(glitchColor);
 						child.material.emissiveIntensity = 0.8 + Math.random() * 0.4;
@@ -867,18 +874,18 @@
 				});
 
 				// Add random position shift
-				window.svgGroup.position.x = (Math.random() - 0.5) * 0.1;
+				globalSvgGroup.position.x = (Math.random() - 0.5) * 0.1;
 
 				// Reset after short delay
 				setTimeout(() => {
-					if (window.svgGroup) {
-						window.svgGroup.traverse((child) => {
+					if (globalSvgGroup) {
+						globalSvgGroup.traverse((child) => {
 							if (child.isMesh) {
 								child.material.emissive.set(params.material.emissive);
 								child.material.emissiveIntensity = params.material.emissiveIntensity;
 							}
 						});
-						window.svgGroup.position.x = 0;
+						globalSvgGroup.position.x = 0;
 					}
 				}, 100 + Math.random() * 200);
 			}
@@ -948,13 +955,13 @@
 			// pixelPass.uniforms.zxMode.value = false; // Keep ZX colors
 
 			// Make the 3D model visible
-			window.svgGroup.visible = true;
+			globalSvgGroup.visible = true;
 
 			// Set up the event handlers for showing the GUI
 			setupControlPanelToggle();
 
 			// Keep yellow on blue colors as requested
-			window.svgGroup.traverse((child) => {
+			globalSvgGroup.traverse((child) => {
 				if (child.isMesh) {
 					// Enhance the existing material
 					child.material.emissiveIntensity = 0.7;
@@ -969,13 +976,13 @@
 			camera.updateProjectionMatrix();
 
 			// Better position the model
-			window.svgGroup.position.y = 0;
+			globalSvgGroup.position.y = 0;
 
 			// Function to set up click/tap detection for the control panel after logo is revealed
 			function setupControlPanelToggle() {
 				// Reference the GUI by variable name from outer scope
-				// Use window to make sure we access the globally defined gui
-				const guiElement = window.ampControlPanel;
+				// Use our top-level variable to access the globally defined gui
+				const guiElement = ampControlPanel;
 
 				// Local function to toggle GUI visibility
 				const toggleLogoGUI = () => {
@@ -1056,7 +1063,7 @@
 		document.addEventListener('touchend', (e) => {
 			// Only trigger if loading is complete (instructions are visible)
 			if (document.querySelector('.instructions').style.display === 'block' &&
-				(!window.svgGroup || !window.svgGroup.visible)) {
+				(!globalSvgGroup || !globalSvgGroup.visible)) {
 				revealLogo();
 				// Prevent default to avoid any conflicts
 				e.preventDefault();
@@ -1066,14 +1073,14 @@
 
 
 		function animate() {
-			if (window.svgGroup) {
+			if (globalSvgGroup) {
 				// Rotate around Y axis at configurable speed
-				window.svgGroup.rotation.y += params.animation.rotationSpeed;
+				globalSvgGroup.rotation.y += params.animation.rotationSpeed;
 
 				// Add subtle wobble rotation if enabled
 				if (params.animation.enableWobble) {
-					window.svgGroup.rotation.x = Math.sin(Date.now() * 0.0005) * 0.1;
-					window.svgGroup.rotation.z = Math.cos(Date.now() * 0.0003) * 0.05;
+					globalSvgGroup.rotation.x = Math.sin(Date.now() * 0.0005) * 0.1;
+					globalSvgGroup.rotation.z = Math.cos(Date.now() * 0.0003) * 0.05;
 				}
 
 				// Apply random glitch effects
@@ -1081,8 +1088,8 @@
 			}
 
 			// Use effect composer for rendering with bloom if available, otherwise fallback to renderer
-			if (window.composer) {
-				window.composer.render();
+			if (globalComposer) {
+				globalComposer.render();
 			} else {
 				renderer.render(scene, camera);
 			}
@@ -1101,11 +1108,11 @@
 			renderer.setSize(width, height);
 
 			// Update composer if it exists
-			if (window.composer) {
-				window.composer.setSize(width, height);
+			if (globalComposer) {
+				globalComposer.setSize(width, height);
 
 				// Update pixelation shader if it exists
-				const pixelPass = window.composer.passes.find(pass => pass.uniforms && pass.uniforms.pixelSize);
+				const pixelPass = globalComposer.passes.find(pass => pass.uniforms && pass.uniforms.pixelSize);
 				if (pixelPass && pixelPass.uniforms) {
 					pixelPass.uniforms.resolution.value.set(width, height);
 				}
