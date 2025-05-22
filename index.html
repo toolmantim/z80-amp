@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>ZX Amp</title>
-	<script type="importmap">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ZX Amp</title>
+    <script type="importmap">
       {
         "imports": {
           "three": "https://cdn.jsdelivr.net/npm/three@0.176.0/build/three.module.js",
@@ -13,350 +12,382 @@
         }
       }
     </script>
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&display=swap">
-	<style>
-		body {
-			margin: 0;
-			background-color: #000;
-			color: #00ff00;
-			font-family: 'VT323', monospace;
-			overflow: hidden;
-		}
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=VT323&display=swap"
+    />
+    <style>
+      body {
+        margin: 0;
+        background-color: #000;
+        color: #00ff00;
+        font-family: "VT323", monospace;
+        overflow: hidden;
+      }
 
-		/* ZX Spectrum loading border */
-		.zx-border {
-			position: fixed;
-			top: 0;
-			left: 0;
-			right: 0;
-			bottom: 0;
-			border: 24px solid #000;
-			z-index: 20;
-			pointer-events: none;
-			overflow: hidden;
-		}
+      /* ZX Spectrum loading border */
+      .zx-border {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border: 24px solid #000;
+        z-index: 20;
+        pointer-events: none;
+        overflow: hidden;
+      }
 
-		/* Border stripes animation */
-		.border-stripes {
-			position: absolute;
-			top: -24px;
-			left: -100px;
-			/* Extended far to the left to prevent gaps */
-			right: -100px;
-			/* Extended far to the right for good measure */
-			bottom: -24px;
-			background: repeating-linear-gradient(to right,
-					#0000ff 0px, #0000ff 8px,
-					#ff0000 8px, #ff0000 16px,
-					#ff00ff 16px, #ff00ff 24px,
-					#00ffff 24px, #00ffff 32px,
-					#00ff00 32px, #00ff00 40px,
-					#ffff00 40px, #ffff00 48px,
-					#ffffff 48px, #ffffff 56px);
-			animation: move-stripes 2s linear infinite;
-			z-index: 15;
-			overflow: hidden;
-			/* Make sure it doesn't affect other elements */
-		}
+      /* Border stripes animation */
+      .border-stripes {
+        position: absolute;
+        top: -24px;
+        left: -100px;
+        /* Extended far to the left to prevent gaps */
+        right: -100px;
+        /* Extended far to the right for good measure */
+        bottom: -24px;
+        background: repeating-linear-gradient(
+          to right,
+          #0000ff 0px,
+          #0000ff 8px,
+          #ff0000 8px,
+          #ff0000 16px,
+          #ff00ff 16px,
+          #ff00ff 24px,
+          #00ffff 24px,
+          #00ffff 32px,
+          #00ff00 32px,
+          #00ff00 40px,
+          #ffff00 40px,
+          #ffff00 48px,
+          #ffffff 48px,
+          #ffffff 56px
+        );
+        animation: move-stripes 2s linear infinite;
+        z-index: 15;
+        overflow: hidden;
+        /* Make sure it doesn't affect other elements */
+      }
 
-		@keyframes move-stripes {
+      @keyframes move-stripes {
+        /* Moving the full width of the pattern (56px) */
+        /* Starting from negative to ensure no gaps on left */
+        0% {
+          transform: translateX(-56px);
+        }
 
-			/* Moving the full width of the pattern (56px) */
-			/* Starting from negative to ensure no gaps on left */
-			0% {
-				transform: translateX(-56px);
-			}
+        100% {
+          transform: translateX(0);
+        }
+      }
 
-			100% {
-				transform: translateX(0);
-			}
-		}
+      /* ZX Loading text */
+      .loading-text {
+        position: absolute;
+        bottom: 60px;
+        left: 40px;
+        font-family: "VT323", monospace;
+        font-size: 28px;
+        color: #ffffff;
+        z-index: 30;
+        text-shadow: 2px 2px 0 #000;
+        animation: flash-text 0.8s step-end infinite;
+      }
 
-		/* ZX Loading text */
-		.loading-text {
-			position: absolute;
-			bottom: 60px;
-			left: 40px;
-			font-family: 'VT323', monospace;
-			font-size: 28px;
-			color: #ffffff;
-			z-index: 30;
-			text-shadow: 2px 2px 0 #000;
-			animation: flash-text 0.8s step-end infinite;
-		}
+      @keyframes flash-text {
+        0%,
+        49% {
+          color: #ff0000;
+          background-color: transparent;
+        }
 
-		@keyframes flash-text {
+        50%,
+        100% {
+          color: #ffffff;
+          background-color: #ff0000;
+        }
+      }
 
-			0%,
-			49% {
-				color: #ff0000;
-				background-color: transparent;
-			}
+      /* Progress counter */
+      .progress-counter {
+        position: absolute;
+        bottom: 40px;
+        right: 40px;
+        font-family: "VT323", monospace;
+        font-size: 24px;
+        color: #ffffff;
+        z-index: 30;
+        text-shadow: 2px 2px 0 #000;
+      }
 
-			50%,
-			100% {
-				color: #ffffff;
-				background-color: #ff0000;
-			}
-		}
+      /* ZX Spectrum style logo text */
+      .logo-placeholder {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-family: "VT323", monospace;
+        font-size: 120px;
+        font-weight: bold;
+        color: var(--logo-fg-color, #ffff00);
+        /* Bright yellow by default */
+        background-color: var(--logo-bg-color, #0000ff);
+        /* Blue background by default */
+        padding: 10px 40px;
+        border: 8px solid #ffffff;
+        z-index: 20;
+        text-shadow: 4px 4px 0 #000;
+        letter-spacing: 5px;
+      }
 
-		/* Progress counter */
-		.progress-counter {
-			position: absolute;
-			bottom: 40px;
-			right: 40px;
-			font-family: 'VT323', monospace;
-			font-size: 24px;
-			color: #ffffff;
-			z-index: 30;
-			text-shadow: 2px 2px 0 #000;
-		}
+      /* Instructions text */
+      .instructions {
+        position: absolute;
+        bottom: 120px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-family: "VT323", monospace;
+        font-size: 24px;
+        color: #ffffff;
+        z-index: 30;
+        text-shadow: 2px 2px 0 #000;
+        animation: flash-instructions 1.2s step-end infinite;
+      }
 
-		/* ZX Spectrum style logo text */
-		.logo-placeholder {
-			position: absolute;
-			top: 50%;
-			left: 50%;
-			transform: translate(-50%, -50%);
-			font-family: 'VT323', monospace;
-			font-size: 120px;
-			font-weight: bold;
-			color: var(--logo-fg-color, #ffff00);
-			/* Bright yellow by default */
-			background-color: var(--logo-bg-color, #0000ff);
-			/* Blue background by default */
-			padding: 10px 40px;
-			border: 8px solid #ffffff;
-			z-index: 20;
-			text-shadow: 4px 4px 0 #000;
-			letter-spacing: 5px;
-		}
+      @keyframes flash-instructions {
+        0%,
+        49% {
+          opacity: 1;
+        }
 
-		/* Instructions text */
-		.instructions {
-			position: absolute;
-			bottom: 120px;
-			left: 50%;
-			transform: translateX(-50%);
-			font-family: 'VT323', monospace;
-			font-size: 24px;
-			color: #ffffff;
-			z-index: 30;
-			text-shadow: 2px 2px 0 #000;
-			animation: flash-instructions 1.2s step-end infinite;
-		}
+        50%,
+        100% {
+          opacity: 0;
+        }
+      }
 
-		@keyframes flash-instructions {
+      /* Retro screen glitch effect for transition */
+      .screen-glitch {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: linear-gradient(
+          0deg,
+          transparent 0%,
+          rgba(32, 128, 255, 0.2) 2%,
+          rgba(32, 128, 255, 0.8) 3%,
+          rgba(32, 128, 255, 0.2) 3%,
+          transparent 100%
+        );
+        background-size: 100% 20px;
+        z-index: 1000;
+        pointer-events: none;
+        opacity: 0;
+        mix-blend-mode: lighten;
+        animation: glitch-lines 0.12s steps(6) infinite;
+      }
 
-			0%,
-			49% {
-				opacity: 1;
-			}
+      @keyframes glitch-lines {
+        0% {
+          background-position: 0 0;
+        }
 
-			50%,
-			100% {
-				opacity: 0;
-			}
-		}
+        100% {
+          background-position: 0 100%;
+        }
+      }
 
-		/* Retro screen glitch effect for transition */
-		.screen-glitch {
-			position: fixed;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			background-image: linear-gradient(0deg,
-					transparent 0%,
-					rgba(32, 128, 255, 0.2) 2%,
-					rgba(32, 128, 255, 0.8) 3%,
-					rgba(32, 128, 255, 0.2) 3%,
-					transparent 100%);
-			background-size: 100% 20px;
-			z-index: 1000;
-			pointer-events: none;
-			opacity: 0;
-			mix-blend-mode: lighten;
-			animation: glitch-lines 0.12s steps(6) infinite;
-		}
+      .scanline {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        /* Subtle CRT glow effect */
+        background: linear-gradient(
+          to bottom,
+          rgba(0, 20, 0, 0.03),
+          rgba(0, 50, 0, 0.06) 50%,
+          rgba(0, 20, 0, 0.03)
+        );
+        z-index: 10;
+        pointer-events: none;
+        opacity: 0.6;
+        animation: scanline 10s linear infinite;
+      }
 
-		@keyframes glitch-lines {
-			0% {
-				background-position: 0 0;
-			}
+      @keyframes scanline {
+        0% {
+          opacity: 0.5;
+        }
 
-			100% {
-				background-position: 0 100%;
-			}
-		}
+        50% {
+          opacity: 0.7;
+        }
 
-		.scanline {
-			position: absolute;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			/* Subtle CRT glow effect */
-			background: linear-gradient(to bottom, rgba(0, 20, 0, 0.03), rgba(0, 50, 0, 0.06) 50%, rgba(0, 20, 0, 0.03));
-			z-index: 10;
-			pointer-events: none;
-			opacity: 0.6;
-			animation: scanline 10s linear infinite;
-		}
+        100% {
+          opacity: 0.5;
+        }
+      }
 
-		@keyframes scanline {
-			0% {
-				opacity: 0.5;
-			}
+      .crt-effect {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 11;
+        background: radial-gradient(
+          ellipse at center,
+          transparent 50%,
+          rgba(0, 20, 0, 0.7) 100%
+        );
+        box-shadow: inset 0 0 100px rgba(0, 50, 0, 0.3);
+      }
 
-			50% {
-				opacity: 0.7;
-			}
+      /* Random screen flicker */
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 50, 0, 0.03);
+        opacity: 0;
+        z-index: 12;
+        pointer-events: none;
+        animation: flicker 5s infinite;
+      }
 
-			100% {
-				opacity: 0.5;
-			}
-		}
+      @keyframes flicker {
+        0% {
+          opacity: 0;
+        }
 
-		.crt-effect {
-			position: absolute;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			pointer-events: none;
-			z-index: 11;
-			background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 20, 0, 0.7) 100%);
-			box-shadow: inset 0 0 100px rgba(0, 50, 0, 0.3);
-		}
+        5% {
+          opacity: 0;
+        }
 
-		/* Random screen flicker */
-		body::before {
-			content: "";
-			position: fixed;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			background: rgba(0, 50, 0, 0.03);
-			opacity: 0;
-			z-index: 12;
-			pointer-events: none;
-			animation: flicker 5s infinite;
-		}
+        5.1% {
+          opacity: 0.3;
+        }
 
-		@keyframes flicker {
-			0% {
-				opacity: 0;
-			}
+        5.2% {
+          opacity: 0;
+        }
 
-			5% {
-				opacity: 0;
-			}
+        27% {
+          opacity: 0;
+        }
 
-			5.1% {
-				opacity: 0.3;
-			}
+        27.1% {
+          opacity: 0.2;
+        }
 
-			5.2% {
-				opacity: 0;
-			}
+        27.2% {
+          opacity: 0;
+        }
 
-			27% {
-				opacity: 0;
-			}
+        75% {
+          opacity: 0;
+        }
 
-			27.1% {
-				opacity: 0.2;
-			}
+        75.1% {
+          opacity: 0.5;
+        }
 
-			27.2% {
-				opacity: 0;
-			}
+        75.2% {
+          opacity: 0;
+        }
 
-			75% {
-				opacity: 0;
-			}
+        100% {
+          opacity: 0;
+        }
+      }
 
-			75.1% {
-				opacity: 0.5;
-			}
+      .blink {
+        animation: blink 1s step-end infinite;
+      }
 
-			75.2% {
-				opacity: 0;
-			}
+      @keyframes blink {
+        50% {
+          opacity: 0;
+        }
+      }
+    </style>
+  </head>
 
-			100% {
-				opacity: 0;
-			}
-		}
+  <body>
+    <div class="scanline"></div>
+    <div
+      class="crt-effect"
+      id="crt-vignette"
+      style="mix-blend-mode: overlay"
+    ></div>
+    <div class="zx-border">
+      <div class="border-stripes"></div>
+    </div>
+    <div class="logo-placeholder">AMP</div>
+    <div class="loading-text">LOADING ZX80 AMP...</div>
+    <div class="progress-counter">0%</div>
+    <div class="instructions" style="display: none">
+      <span class="desktop-instructions">PRESS ENTER TO CONTINUE</span>
+      <span class="mobile-instructions" style="display: none"
+        >TAP TO CONTINUE</span
+      >
+    </div>
 
-		.blink {
-			animation: blink 1s step-end infinite;
-		}
+    <script type="module">
+      import * as THREE from "three";
+      import { SVGLoader } from "three/addons/loaders/SVGLoader.js";
+      import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+      import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+      import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+      import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+      import { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
+      import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 
-		@keyframes blink {
-			50% {
-				opacity: 0;
-			}
-		}
-	</style>
-</head>
+      let globalComposer;
+      let globalSvgGroup;
+      let ampControlPanel;
 
-<body>
-	<div class="scanline"></div>
-	<div class="crt-effect" id="crt-vignette" style="mix-blend-mode: overlay;"></div>
-	<div class="zx-border">
-		<div class="border-stripes"></div>
-	</div>
-	<div class="logo-placeholder">AMP</div>
-	<div class="loading-text">LOADING ZX80 AMP...</div>
-	<div class="progress-counter">0%</div>
-	<div class="instructions" style="display: none;">
-		<span class="desktop-instructions">PRESS ENTER TO CONTINUE</span>
-		<span class="mobile-instructions" style="display: none;">TAP TO CONTINUE</span>
-	</div>
+      // Initialize CSS variables for logo colors
+      document.documentElement.style.setProperty("--logo-fg-color", "#ffff00");
+      document.documentElement.style.setProperty("--logo-bg-color", "#0000ff");
 
-	<script type="module">
-		import * as THREE from 'three';
-		import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
-		import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-		import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-		import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-		import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-		import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
-		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      );
 
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setClearColor(0x000000);
+      document.body.appendChild(renderer.domElement);
+      // Define pixelation shader with ZX Spectrum limitations
+      const PixelShader = {
+        uniforms: {
+          tDiffuse: { value: null },
+          resolution: {
+            value: new THREE.Vector2(window.innerWidth, window.innerHeight),
+          },
+          pixelSize: { value: 8.0 },
+          zxMode: { value: true },
+          fgColor: { value: new THREE.Vector3(1.0, 1.0, 0.0) },
+          bgColor: { value: new THREE.Vector3(0.0, 0.0, 1.0) },
+          vinStrength: { value: 0.5 },
+          vinEnabled: { value: true },
+        },
 
-	let globalComposer;
-	let globalSvgGroup;
-	let ampControlPanel;
-
-			// Initialize CSS variables for logo colors
-			document.documentElement.style.setProperty('--logo-fg-color', '#ffff00');
-			document.documentElement.style.setProperty('--logo-bg-color', '#0000ff');
-
-		const scene = new THREE.Scene();
-		const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-
-		const renderer = new THREE.WebGLRenderer({ antialias: true });
-		renderer.setSize(window.innerWidth, window.innerHeight);
-			renderer.setClearColor(0x000000);
-			document.body.appendChild(renderer.domElement);
-		// Define pixelation shader with ZX Spectrum limitations
-		const PixelShader = {
-			uniforms: {
-				tDiffuse: { value: null },
-				resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-				pixelSize: { value: 8.0 },
-				zxMode: { value: true },
-				fgColor: { value: new THREE.Vector3(1.0, 1.0, 0.0) },
-				bgColor: { value: new THREE.Vector3(0.0, 0.0, 1.0) },
-				vinStrength: { value: 0.5 },
-				vinEnabled: { value: true }
-			},
-
-			vertexShader: /* glsl */ `
+        vertexShader: /* glsl */ `
 				varying vec2 vUv;
 				varying vec2 vPosition;
 				
@@ -367,7 +398,7 @@
 				}
 			`,
 
-			fragmentShader: /* glsl */ `
+        fragmentShader: /* glsl */ `
 			uniform sampler2D tDiffuse;
 			uniform vec2 resolution;
 			uniform float pixelSize;
@@ -475,635 +506,708 @@
 					gl_FragColor.rgb -= scanline;
 				}
 			}
-			`
-		};
-
-		// Define adjustable parameters globally so they're available everywhere
-		const params = {
-			// Bloom parameters
-			bloom: {
-				threshold: 0,
-				strength: 1.0,
-				radius: 0.4,
-				exposure: 1
-			},
-			// Material parameters
-			material: {
-				color: 0xffffff,
-				metalness: 0,
-				roughness: 0.2,
-				emissive: 0xffffff,
-				emissiveIntensity: 1.0
-			},
-			// Animation parameters
-			animation: {
-				rotationSpeed: 0.003,
-				enableWobble: true,
-				glitchEffect: true
-			},
-			// Pixelation parameters
-			pixelation: {
-				pixelSize: 6,
-				enabled: true
-			},
-			// Scanline parameters
-			scanline: {
-				intensity: 0.2,
-				spacing: 1.0,
-				enabled: true
-			},
-			// Vignette parameters
-			vignette: {
-				strength: 0.5,
-				enabled: true
-			},
-			// Logo colors
-			logoColors: {
-				foreground: 0xffff00,
-				background: 0x0000ff
-			}
-		};
-
-		const loader = new SVGLoader();
-		loader.load('./amp-logo.svg', function (data) {
-			const paths = data.paths;
-
-			const rotationGroup = new THREE.Group();
-			scene.add(rotationGroup);
-
-			const svgGroup = new THREE.Group();
-
-			const ambientLight = new THREE.AmbientLight(0x005500, 1.5);
-			scene.add(ambientLight);
-
-			const mainLight = new THREE.DirectionalLight(0x00ff00, 1.0);
-			mainLight.position.set(2, 1, 0);
-			mainLight.castShadow = true;
-			scene.add(mainLight);
-
-			const sideLight = new THREE.DirectionalLight(0x00aa00, 0.8);
-			sideLight.position.set(-1, 0.5, 3);
-			sideLight.castShadow = true;
-			scene.add(sideLight);
-
-			const backLight = new THREE.DirectionalLight(0x009900, 0.6);
-			backLight.position.set(0, -1, -3);
-			backLight.castShadow = true;
-			scene.add(backLight);
-
-			const centerLight = new THREE.PointLight(0x00ff99, 0.8, 12);
-			centerLight.position.set(0, 0, 2);
-			scene.add(centerLight);
-
-			const extrudeSettings = {
-				depth: 60,
-				bevelEnabled: true,
-				bevelThickness: 10,
-				bevelSize: 8,
-				bevelSegments: 3
-			};
-
-			for (let i = 0; i < paths.length; i++) {
-				const path = paths[i];
-				const material = new THREE.MeshStandardMaterial({
-					color: params.material.color,
-					side: THREE.DoubleSide,
-					metalness: params.material.metalness,
-					roughness: params.material.roughness,
-					emissive: params.material.emissive,
-					emissiveIntensity: params.material.emissiveIntensity
-				});
-
-				const shapes = path.toShapes(true);
-
-				for (let j = 0; j < shapes.length; j++) {
-					const shape = shapes[j];
-					const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-					const mesh = new THREE.Mesh(geometry, material);
-					svgGroup.add(mesh);
-				}
-			}
-
-			// Apply scaling to the SVG content
-			svgGroup.scale.set(0.0012, -0.0012, 0.0012);
-
-			// Calculate the center of the SVG using bounding box
-			const box = new THREE.Box3().setFromObject(svgGroup);
-			const center = box.getCenter(new THREE.Vector3());
-
-			// Move the SVG so its visual center is at the origin
-			svgGroup.position.sub(center);
-
-			// Add the centered SVG to the rotation group
-			rotationGroup.add(svgGroup);
-
-			// Position the rotation group in the scene
-			rotationGroup.position.set(0, 0, 1.2); // Move forward to be more visible
-			rotationGroup.scale.set(1.2, 1.2, 1.2); // Scale up for better visibility
-
-			// Setup renderer settings (same as the example)
-			renderer.toneMapping = THREE.ReinhardToneMapping;
-			renderer.toneMappingExposure = Math.pow(params.bloom.exposure, 4.0);
-			renderer.shadowMap.enabled = true;
-			renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-			// Set up bloom effect - following the official example
-			const renderScene = new RenderPass(scene, camera);
-
-			// Create ZX Spectrum-style pixelation effect
-			const pixelPass = new ShaderPass(PixelShader);
-			pixelPass.uniforms.resolution.value.set(window.innerWidth, window.innerHeight);
-			pixelPass.uniforms.pixelSize.value = params.pixelation.pixelSize;
-			pixelPass.uniforms.scanlineIntensity = { value: params.scanline.intensity };
-			pixelPass.uniforms.scanlineSpacing = { value: params.scanline.spacing };
-			pixelPass.uniforms.scanlineEnabled = { value: params.scanline.enabled };
-			pixelPass.uniforms.zxMode = { value: true };
-			// Set the initial colors from our params
-			pixelPass.uniforms.fgColor.value = new THREE.Vector3(
-				((params.logoColors.foreground >> 16) & 0xff) / 255,
-				((params.logoColors.foreground >> 8) & 0xff) / 255,
-				(params.logoColors.foreground & 0xff) / 255
-			);
-			pixelPass.uniforms.bgColor.value = new THREE.Vector3(
-				((params.logoColors.background >> 16) & 0xff) / 255,
-				((params.logoColors.background >> 8) & 0xff) / 255,
-				(params.logoColors.background & 0xff) / 255
-			);
-
-			const bloomPass = new UnrealBloomPass(
-				new THREE.Vector2(window.innerWidth, window.innerHeight)
-			);
-			bloomPass.threshold = params.bloom.threshold;
-			bloomPass.strength = params.bloom.strength;
-			bloomPass.radius = params.bloom.radius;
-
-			const outputPass = new OutputPass();
-
-			// Create composer with the passes
-			const composer = new EffectComposer(renderer);
-			composer.addPass(renderScene);
-
-			globalComposer = composer;
-
-			// Skip bloom pass for more authentic ZX80 look
-			// composer.addPass(bloomPass);
-
-			// Add pixelation if enabled
-			if (params.pixelation.enabled) {
-				composer.addPass(pixelPass);
-			}
-
-			composer.addPass(outputPass);
-
-			// Store composer so we can access it in animate function
-			globalComposer = composer;
-
-			// Set rotation for animation
-			globalSvgGroup = rotationGroup;
-
-			// Initially hide the 3D model until Enter is pressed
-			globalSvgGroup.visible = false;
-
-			// Setup GUI controls with ZX80 style (hidden by default)
-			const gui = new GUI({ autoPlace: false, width: 320 });
-			gui.domElement.style.fontFamily = '"VT323", monospace';
-			gui.title('ZX80 CONTROL PANEL');
-			gui.close();
-
-			// Add GUI to document body but hidden by default
-			document.body.appendChild(gui.domElement);
-			gui.domElement.style.position = 'absolute';
-			gui.domElement.style.right = '20px';
-			gui.domElement.style.top = '20px';
-			gui.domElement.style.display = 'none';
-
-			// Store GUI in a global variable for access from 3D logo interaction
-			ampControlPanel = gui;
-
-			// Apply ZX80 style to GUI
-			const guiElement = document.querySelector('.lil-gui');
-			if (guiElement) {
-				setTimeout(() => {
-					// Style the main container
-					guiElement.style.backgroundColor = 'rgba(0, 20, 0, 0.85)';
-					guiElement.style.border = '2px solid #00ff00';
-					guiElement.style.color = '#00ff00';
-					guiElement.style.textShadow = '0 0 5px #00ff00';
-					guiElement.style.fontSize = '14px';
-					guiElement.style.boxShadow = '0 0 10px rgba(0, 255, 0, 0.3)';
-
-
-					// Handle all GUI elements
-					const allElements = guiElement.querySelectorAll('*');
-					allElements.forEach(el => {
-						el.style.borderColor = '#00ff00';
-						el.style.color = '#00ff00';
-
-						// Add some scanline effect to inputs
-						if (el.tagName === 'INPUT' || el.classList.contains('slider')) {
-							el.style.backgroundColor = 'rgba(0, 30, 0, 0.6)';
-						}
-
-						// Special style for title
-						if (el.classList.contains('title')) {
-							el.style.textShadow = '0 0 5px #00ff00';
-							el.style.letterSpacing = '1px';
-						}
-					});
-				}, 100);
-			}
-
-			// Create folders for different parameter groups
-			// Remove bloom folder since it's not used in ZX80 style
-			// const bloomFolder = gui.addFolder('BLOOM EFFECT');
-			const materialFolder = gui.addFolder('MATERIAL');
-			const animationFolder = gui.addFolder('ANIMATION');
-			const pixelFolder = gui.addFolder('ZX80 PIXELATION');
-			const scanlineFolder = gui.addFolder('SCANLINE EFFECT');
-			const vignetteFolder = gui.addFolder('VIGNETTE EFFECT');
-			const logoColorsFolder = gui.addFolder('LOGO COLORS');
-
-			// Bloom controls removed for ZX80 style
-			// They were causing the white reflections and square outlines
-
-			// Material controls
-			materialFolder.addColor(params.material, 'color').onChange(() => updateMaterials());
-			materialFolder.addColor(params.material, 'emissive').onChange(() => updateMaterials());
-			materialFolder.add(params.material, 'metalness', 0, 100).onChange(() => updateMaterials());
-			materialFolder.add(params.material, 'roughness', 0, 1).onChange(() => updateMaterials());
-			materialFolder.add(params.material, 'emissiveIntensity', 0, 2).onChange(() => updateMaterials());
-
-			// Animation controls
-			animationFolder.add(params.animation, 'rotationSpeed', 0, 0.02).name('ROTATION SPEED');
-			animationFolder.add(params.animation, 'enableWobble').name('ENABLE WOBBLE');
-			animationFolder.add(params.animation, 'glitchEffect').name('GLITCH EFFECT');
-
-			// Helper function to update all materials
-			function updateMaterials() {
-				svgGroup.traverse((child) => {
-					if (child.isMesh) {
-						child.material.color.set(params.material.color);
-						child.material.emissive.set(params.material.emissive);
-						child.material.metalness = params.material.metalness;
-						child.material.roughness = params.material.roughness;
-						child.material.emissiveIntensity = params.material.emissiveIntensity;
-						child.material.needsUpdate = true;
-					}
-				});
-			}
-
-			// Pixelation controls
-			pixelFolder.add(params.pixelation, 'enabled').name('ENABLE PIXELATION').onChange(value => {
-				if (value) {
-					composer.addPass(pixelPass);
-				} else {
-					composer.removePass(pixelPass);
-				}
-			});
-
-			pixelFolder.add(params.pixelation, 'pixelSize', 1, 16).step(1).name('PIXEL SIZE').onChange(value => {
-				pixelPass.uniforms.pixelSize.value = Number(value);
-			});
-
-			// Add scanline controls
-			scanlineFolder.add(params.scanline, 'enabled').name('ENABLE SCANLINES').onChange(value => {
-				pixelPass.uniforms.scanlineEnabled.value = value;
-			});
-
-			scanlineFolder.add(params.scanline, 'intensity', 0, 0.2).step(0.01).name('SCANLINE INTENSITY').onChange(value => {
-				pixelPass.uniforms.scanlineIntensity.value = value;
-			});
-
-			scanlineFolder.add(params.scanline, 'spacing', 0.1, 1.0).step(0.05).name('SCANLINE SPACING').onChange(value => {
-				pixelPass.uniforms.scanlineSpacing.value = value;
-			});
-
-			// Logo color controls
-			logoColorsFolder.addColor(params.logoColors, 'foreground').name('FOREGROUND COLOR').onChange(value => {
-				// Update the foreground color in the shader
-				pixelPass.uniforms.fgColor.value = new THREE.Vector3(
-					((value >> 16) & 0xff) / 255,
-					((value >> 8) & 0xff) / 255,
-					(value & 0xff) / 255
-				);
-
-				// Update CSS variable for the static logo
-				document.documentElement.style.setProperty('--logo-fg-color', '#' + value.toString(16).padStart(6, '0'));
-			});
-
-			logoColorsFolder.addColor(params.logoColors, 'background').name('BACKGROUND COLOR').onChange(value => {
-				// Update the background color in the shader
-				pixelPass.uniforms.bgColor.value = new THREE.Vector3(
-					((value >> 16) & 0xff) / 255,
-					((value >> 8) & 0xff) / 255,
-					(value & 0xff) / 255
-				);
-
-				// Update CSS variable for the static logo
-				document.documentElement.style.setProperty('--logo-bg-color', '#' + value.toString(16).padStart(6, '0'));
-			});
-
-			// Add vignette controls for the CSS-based vignette
-			vignetteFolder.add(params.vignette, 'enabled').name('ENABLE VIGNETTE').onChange(value => {
-				const crtVignette = document.getElementById('crt-vignette');
-				crtVignette.style.display = value ? 'block' : 'none';
-			});
-
-			vignetteFolder.add(params.vignette, 'strength', 0, 1).step(0.05).name('VIGNETTE STRENGTH').onChange(value => {
-				const crtVignette = document.getElementById('crt-vignette');
-				// Update the radial-gradient with the new strength value
-				const opacity = 0.3 + (value * 0.7); // Scale from 0.3 to 1.0 based on strength
-				crtVignette.style.background = `radial-gradient(ellipse at center, transparent ${50 - value * 25}%, rgba(0, 20, 0, ${opacity}) 100%)`;
-				crtVignette.style.boxShadow = `inset 0 0 ${100 + value * 100}px rgba(0, 50, 0, ${opacity / 2})`;
-			});
-
-			// Open folders by default
-
-			materialFolder.open();
-			animationFolder.open();
-			pixelFolder.open();
-			scanlineFolder.open();
-			vignetteFolder.open();
-			logoColorsFolder.open();
-		});
-
-		// Position camera closer to zoom in on the logo and center it for ZX Spectrum display
-		camera.position.z = 3.5; // Move camera a bit closer
-		camera.fov = 45; // Narrower field of view for closer look
-		camera.position.y = -0.2; // Offset slightly to center in the screen
-		camera.updateProjectionMatrix(); // Update after changing FOV
-
-		// Apply the initial vignette settings
-		const crtVignette = document.getElementById('crt-vignette');
-		if (crtVignette) {
-			const opacity = 0.3 + (params.vignette.strength * 0.7);
-			crtVignette.style.display = params.vignette.enabled ? 'block' : 'none';
-			crtVignette.style.background = `radial-gradient(ellipse at center, transparent ${50 - params.vignette.strength * 25}%, rgba(0, 20, 0, ${opacity}) 100%)`;
-			crtVignette.style.boxShadow = `inset 0 0 ${100 + params.vignette.strength * 100}px rgba(0, 50, 0, ${opacity / 2})`;
-		}
-
-		// Function to create random ZX80-style glitch effect
-		function applyRandomGlitch() {
-			if (!params.animation.glitchEffect) return;
-
-			// Occasionally apply glitch effect (1% chance per frame)
-			if (Math.random() < 0.01) {
-				// Random color shift
-				const glitchColor = new THREE.Color(
-					Math.random() < 0.8 ? 0x00ff00 : 0x00ffff // Occasionally shift color to cyan
-				);
-
-				// Apply to materials
-				globalSvgGroup.traverse((child) => {
-					if (child.isMesh) {
-						child.material.emissive.set(glitchColor);
-						child.material.emissiveIntensity = 0.8 + Math.random() * 0.4;
-					}
-				});
-
-				// Add random position shift
-				globalSvgGroup.position.x = (Math.random() - 0.5) * 0.1;
-
-				// Reset after short delay
-				setTimeout(() => {
-					if (globalSvgGroup) {
-						globalSvgGroup.traverse((child) => {
-							if (child.isMesh) {
-								child.material.emissive.set(params.material.emissive);
-								child.material.emissiveIntensity = params.material.emissiveIntensity;
-							}
-						});
-						globalSvgGroup.position.x = 0;
-					}
-				}, 100 + Math.random() * 200);
-			}
-		}
-
-		// ZX Spectrum loading counter animation
-		let loadingProgress = 0;
-		const progressCounter = document.querySelector('.progress-counter');
-
-		function animateLoading() {
-			// ZX Spectrum style loading progress counter
-			if (loadingProgress < 100) {
-				// Random progress increments like a real ZX Spectrum
-				loadingProgress += Math.floor(Math.random() * 3) + 1;
-				if (loadingProgress > 100) loadingProgress = 100;
-
-				// Update the counter
-				progressCounter.textContent = loadingProgress + '%';
-
-				// When loading reaches 100%, show instructions but keep loading text visible
-				if (loadingProgress === 100) {
-					document.querySelector('.instructions').style.display = 'block';
-					// Keep loading text visible as requested
-				}
-			}
-		}
-
-		// Start the loading animation
-		const loadingInterval = setInterval(animateLoading, 200);
-
-		// Function to handle Enter keypress and reveal the 3D logo
-		function revealLogo() {
-			// Add retro screen glitch before hard cut (no modern fades)
-			function createGlitchEffect() {
-				const glitch = document.createElement('div');
-				glitch.className = 'screen-glitch';
-				document.body.appendChild(glitch);
-
-				// Apply glitch animation
-				setTimeout(() => {
-					glitch.style.opacity = '1';
-
-					// Hard cut to 3D logo after brief glitch
-					setTimeout(() => {
-						// Hide all ZX Spectrum elements immediately - no fade
-						document.querySelector('.zx-border').style.display = 'none';
-						document.querySelector('.logo-placeholder').style.display = 'none';
-						document.querySelector('.loading-text').style.display = 'none';
-						document.querySelector('.progress-counter').style.display = 'none';
-						document.querySelector('.instructions').style.display = 'none';
-						glitch.style.display = 'none';
-					}, 120);
-				}, 50);
-			}
-
-			// Start the retro glitch transition
-			createGlitchEffect();
-
-			// Stop the loading interval
-			clearInterval(loadingInterval);
-
-			// Switch back to ZX80 phosphor green mode but keep the yellow/blue color scheme
-			// pixelPass.uniforms.zxMode.value = false; // Keep ZX colors
-
-			// Make the 3D model visible
-			globalSvgGroup.visible = true;
-
-			// Setup control panel toggle
-			setupControlPanelToggle();
-
-			// Keep yellow on blue colors as requested
-			globalSvgGroup.traverse((child) => {
-				if (child.isMesh) {
-					// Enhance the existing material
-					child.material.emissiveIntensity = 0.7;
-					child.material.needsUpdate = true;
-				}
-			});
-
-			// Setup for a better view of the 3D logo
-			// Position camera for a good view
-			camera.position.set(0, 0, 3.8);
-			camera.fov = 45;
-			camera.updateProjectionMatrix();
-
-			// Better position the model
-			globalSvgGroup.position.y = 0;
-
-			// Function to set up click/tap detection for the control panel after logo is revealed
-			function setupControlPanelToggle() {
-
-				const guiElement = ampControlPanel;
-
-				// Local function to toggle GUI visibility
-				const toggleLogoGUI = () => {
-					if (guiElement && guiElement.domElement) {
-						guiElement.domElement.style.display =
-							guiElement.domElement.style.display === 'none' ? 'block' : 'none';
-					}
-				};
-
-				// Create handlers for click and touch events
-				const handleClick = (e) => {
-					// Only toggle if we're not clicking on the GUI itself
-					const guiElement = document.querySelector('.lil-gui');
-					// Don't toggle if clicking on the GUI panel
-					if (guiElement && !guiElement.contains(e.target)) {
-						toggleLogoGUI();
-					}
-				};
-
-				const handleTouch = (e) => {
-					// Only toggle if we're not touching the GUI itself
-					const guiElement = document.querySelector('.lil-gui');
-
-					// Use changedTouches for touchend event
-					if (e.changedTouches && e.changedTouches.length > 0) {
-						const touch = e.changedTouches[0];
-						const touchTarget = document.elementFromPoint(touch.clientX, touch.clientY);
-
-						// Don't toggle if touching the GUI panel
-						if (guiElement && !guiElement.contains(touchTarget)) {
-							toggleLogoGUI();
-							// Prevent default only when we handle the event
-							e.preventDefault();
-						}
-					}
-				};
-
-				// Add event listeners to the document body
-				document.body.addEventListener('click', handleClick);
-				document.body.addEventListener('touchend', handleTouch);
-			}
-
-			// Add some camera animation
-			const startCameraZ = camera.position.z;
-			const cameraAnimation = () => {
-				camera.position.z = startCameraZ + Math.sin(Date.now() * 0.0005) * 0.3;
-				camera.updateProjectionMatrix();
-				requestAnimationFrame(cameraAnimation);
-			};
-			cameraAnimation();
-
-			// Keep the GUI hidden by default (only show when 'g' is pressed)
-			// document.querySelector('.lil-gui').style.display = 'block';
-		}
-
-		// Check if device is touch-enabled
-		const isTouchDevice = 'ontouchstart' in window;
-
-		// Show appropriate instructions based on device type
-		if (isTouchDevice) {
-			const desktopInstructions = document.querySelector('.desktop-instructions');
-			const mobileInstructions = document.querySelector('.mobile-instructions');
-			if (desktopInstructions && mobileInstructions) {
-				desktopInstructions.style.display = 'none';
-				mobileInstructions.style.display = 'inline';
-			}
-		}
-
-		// Add event listeners for both Enter key and touch
-		document.addEventListener('keydown', (event) => {
-			if (event.key === 'Enter') {
-				revealLogo();
-			}
-		});
-
-		// Add touch event for mobile devices - only for initial reveal
-		// Using touchend so it's consistent with the GUI toggle event
-		document.addEventListener('touchend', (e) => {
-			// Only trigger if loading is complete (instructions are visible)
-			if (document.querySelector('.instructions').style.display === 'block' &&
-				(!globalSvgGroup || !globalSvgGroup.visible)) {
-				revealLogo();
-				// Prevent default to avoid any conflicts
-				e.preventDefault();
-			}
-		});
-
-
-
-		function animate() {
-			if (globalSvgGroup) {
-				// Rotate around Y axis at configurable speed
-				globalSvgGroup.rotation.y += params.animation.rotationSpeed;
-
-				// Add subtle wobble rotation if enabled
-				if (params.animation.enableWobble) {
-					globalSvgGroup.rotation.x = Math.sin(Date.now() * 0.0005) * 0.1;
-					globalSvgGroup.rotation.z = Math.cos(Date.now() * 0.0003) * 0.05;
-				}
-
-				// Apply random glitch effects
-				applyRandomGlitch();
-			}
-
-			// Use effect composer for rendering with bloom if available, otherwise fallback to renderer
-			if (globalComposer) {
-				globalComposer.render();
-			} else {
-				renderer.render(scene, camera);
-			}
-		}
-
-		// Handle window resize
-		window.addEventListener('resize', function () {
-			const width = window.innerWidth;
-			const height = window.innerHeight;
-
-			// Update camera
-			camera.aspect = width / height;
-			camera.updateProjectionMatrix();
-
-			// Update renderer
-			renderer.setSize(width, height);
-
-			// Update composer if it exists
-			if (globalComposer) {
-				globalComposer.setSize(width, height);
-
-				// Update pixelation shader if it exists
-				const pixelPass = globalComposer.passes.find(pass => pass.uniforms && pass.uniforms.pixelSize);
-				if (pixelPass && pixelPass.uniforms) {
-					pixelPass.uniforms.resolution.value.set(width, height);
-				}
-			}
-		});
-
-		renderer.setAnimationLoop(animate);
-	</script>
-</body>
-
+			`,
+      };
+
+      // Define adjustable parameters globally so they're available everywhere
+      const params = {
+        // Bloom parameters
+        bloom: {
+          threshold: 0,
+          strength: 1.0,
+          radius: 0.4,
+          exposure: 1,
+        },
+        // Material parameters
+        material: {
+          color: 0xffffff,
+          metalness: 0,
+          roughness: 0.2,
+          emissive: 0xffffff,
+          emissiveIntensity: 1.0,
+        },
+        // Animation parameters
+        animation: {
+          rotationSpeed: 0.003,
+          enableWobble: true,
+          glitchEffect: true,
+        },
+        // Pixelation parameters
+        pixelation: {
+          pixelSize: 6,
+          enabled: true,
+        },
+        // Scanline parameters
+        scanline: {
+          intensity: 0.2,
+          spacing: 1.0,
+          enabled: true,
+        },
+        // Vignette parameters
+        vignette: {
+          strength: 0.5,
+          enabled: true,
+        },
+        // Logo colors
+        logoColors: {
+          foreground: 0xffff00,
+          background: 0x0000ff,
+        },
+      };
+
+      const loader = new SVGLoader();
+      loader.load("./amp-logo.svg", function (data) {
+        const paths = data.paths;
+
+        const rotationGroup = new THREE.Group();
+        scene.add(rotationGroup);
+
+        const svgGroup = new THREE.Group();
+
+        const ambientLight = new THREE.AmbientLight(0x005500, 1.5);
+        scene.add(ambientLight);
+
+        const mainLight = new THREE.DirectionalLight(0x00ff00, 1.0);
+        mainLight.position.set(2, 1, 0);
+        mainLight.castShadow = true;
+        scene.add(mainLight);
+
+        const sideLight = new THREE.DirectionalLight(0x00aa00, 0.8);
+        sideLight.position.set(-1, 0.5, 3);
+        sideLight.castShadow = true;
+        scene.add(sideLight);
+
+        const backLight = new THREE.DirectionalLight(0x009900, 0.6);
+        backLight.position.set(0, -1, -3);
+        backLight.castShadow = true;
+        scene.add(backLight);
+
+        const centerLight = new THREE.PointLight(0x00ff99, 0.8, 12);
+        centerLight.position.set(0, 0, 2);
+        scene.add(centerLight);
+
+        const extrudeSettings = {
+          depth: 60,
+          bevelEnabled: true,
+          bevelThickness: 10,
+          bevelSize: 8,
+          bevelSegments: 3,
+        };
+
+        for (let i = 0; i < paths.length; i++) {
+          const path = paths[i];
+          const material = new THREE.MeshStandardMaterial({
+            color: params.material.color,
+            side: THREE.DoubleSide,
+            metalness: params.material.metalness,
+            roughness: params.material.roughness,
+            emissive: params.material.emissive,
+            emissiveIntensity: params.material.emissiveIntensity,
+          });
+
+          const shapes = path.toShapes(true);
+
+          for (let j = 0; j < shapes.length; j++) {
+            const shape = shapes[j];
+            const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+            const mesh = new THREE.Mesh(geometry, material);
+            svgGroup.add(mesh);
+          }
+        }
+
+        // Apply scaling to the SVG content
+        svgGroup.scale.set(0.0012, -0.0012, 0.0012);
+
+        // Calculate the center of the SVG using bounding box
+        const box = new THREE.Box3().setFromObject(svgGroup);
+        const center = box.getCenter(new THREE.Vector3());
+
+        // Move the SVG so its visual center is at the origin
+        svgGroup.position.sub(center);
+
+        // Add the centered SVG to the rotation group
+        rotationGroup.add(svgGroup);
+
+        // Position the rotation group in the scene
+        rotationGroup.position.set(0, 0, 1.2); // Move forward to be more visible
+        rotationGroup.scale.set(1.2, 1.2, 1.2); // Scale up for better visibility
+
+        // Setup renderer settings (same as the example)
+        renderer.toneMapping = THREE.ReinhardToneMapping;
+        renderer.toneMappingExposure = Math.pow(params.bloom.exposure, 4.0);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+        // Set up bloom effect - following the official example
+        const renderScene = new RenderPass(scene, camera);
+
+        // Create ZX Spectrum-style pixelation effect
+        const pixelPass = new ShaderPass(PixelShader);
+        pixelPass.uniforms.resolution.value.set(
+          window.innerWidth,
+          window.innerHeight
+        );
+        pixelPass.uniforms.pixelSize.value = params.pixelation.pixelSize;
+        pixelPass.uniforms.scanlineIntensity = {
+          value: params.scanline.intensity,
+        };
+        pixelPass.uniforms.scanlineSpacing = { value: params.scanline.spacing };
+        pixelPass.uniforms.scanlineEnabled = { value: params.scanline.enabled };
+        pixelPass.uniforms.zxMode = { value: true };
+        // Set the initial colors from our params
+        pixelPass.uniforms.fgColor.value = new THREE.Vector3(
+          ((params.logoColors.foreground >> 16) & 0xff) / 255,
+          ((params.logoColors.foreground >> 8) & 0xff) / 255,
+          (params.logoColors.foreground & 0xff) / 255
+        );
+        pixelPass.uniforms.bgColor.value = new THREE.Vector3(
+          ((params.logoColors.background >> 16) & 0xff) / 255,
+          ((params.logoColors.background >> 8) & 0xff) / 255,
+          (params.logoColors.background & 0xff) / 255
+        );
+
+        const bloomPass = new UnrealBloomPass(
+          new THREE.Vector2(window.innerWidth, window.innerHeight)
+        );
+        bloomPass.threshold = params.bloom.threshold;
+        bloomPass.strength = params.bloom.strength;
+        bloomPass.radius = params.bloom.radius;
+
+        const outputPass = new OutputPass();
+
+        // Create composer with the passes
+        const composer = new EffectComposer(renderer);
+        composer.addPass(renderScene);
+
+        globalComposer = composer;
+
+        // Skip bloom pass for more authentic ZX80 look
+        // composer.addPass(bloomPass);
+
+        // Add pixelation if enabled
+        if (params.pixelation.enabled) {
+          composer.addPass(pixelPass);
+        }
+
+        composer.addPass(outputPass);
+
+        // Store composer so we can access it in animate function
+        globalComposer = composer;
+
+        // Set rotation for animation
+        globalSvgGroup = rotationGroup;
+
+        // Initially hide the 3D model until Enter is pressed
+        globalSvgGroup.visible = false;
+
+        // Setup GUI controls with ZX80 style (hidden by default)
+        const gui = new GUI({ autoPlace: false, width: 320 });
+        gui.domElement.style.fontFamily = '"VT323", monospace';
+        gui.title("ZX80 CONTROL PANEL");
+        gui.close();
+
+        // Add GUI to document body but hidden by default
+        document.body.appendChild(gui.domElement);
+        gui.domElement.style.position = "absolute";
+        gui.domElement.style.right = "20px";
+        gui.domElement.style.top = "20px";
+        gui.domElement.style.display = "none";
+
+        // Store GUI in a global variable for access from 3D logo interaction
+        ampControlPanel = gui;
+
+        // Apply ZX80 style to GUI
+        const guiElement = document.querySelector(".lil-gui");
+        if (guiElement) {
+          setTimeout(() => {
+            // Style the main container
+            guiElement.style.backgroundColor = "rgba(0, 20, 0, 0.85)";
+            guiElement.style.border = "2px solid #00ff00";
+            guiElement.style.color = "#00ff00";
+            guiElement.style.textShadow = "0 0 5px #00ff00";
+            guiElement.style.fontSize = "14px";
+            guiElement.style.boxShadow = "0 0 10px rgba(0, 255, 0, 0.3)";
+
+            // Handle all GUI elements
+            const allElements = guiElement.querySelectorAll("*");
+            allElements.forEach((el) => {
+              el.style.borderColor = "#00ff00";
+              el.style.color = "#00ff00";
+
+              // Add some scanline effect to inputs
+              if (el.tagName === "INPUT" || el.classList.contains("slider")) {
+                el.style.backgroundColor = "rgba(0, 30, 0, 0.6)";
+              }
+
+              // Special style for title
+              if (el.classList.contains("title")) {
+                el.style.textShadow = "0 0 5px #00ff00";
+                el.style.letterSpacing = "1px";
+              }
+            });
+          }, 100);
+        }
+
+        // Create folders for different parameter groups
+        // Remove bloom folder since it's not used in ZX80 style
+        // const bloomFolder = gui.addFolder('BLOOM EFFECT');
+        const materialFolder = gui.addFolder("MATERIAL");
+        const animationFolder = gui.addFolder("ANIMATION");
+        const pixelFolder = gui.addFolder("ZX80 PIXELATION");
+        const scanlineFolder = gui.addFolder("SCANLINE EFFECT");
+        const vignetteFolder = gui.addFolder("VIGNETTE EFFECT");
+        const logoColorsFolder = gui.addFolder("LOGO COLORS");
+
+        // Bloom controls removed for ZX80 style
+        // They were causing the white reflections and square outlines
+
+        // Material controls
+        materialFolder
+          .addColor(params.material, "color")
+          .onChange(() => updateMaterials());
+        materialFolder
+          .addColor(params.material, "emissive")
+          .onChange(() => updateMaterials());
+        materialFolder
+          .add(params.material, "metalness", 0, 100)
+          .onChange(() => updateMaterials());
+        materialFolder
+          .add(params.material, "roughness", 0, 1)
+          .onChange(() => updateMaterials());
+        materialFolder
+          .add(params.material, "emissiveIntensity", 0, 2)
+          .onChange(() => updateMaterials());
+
+        // Animation controls
+        animationFolder
+          .add(params.animation, "rotationSpeed", 0, 0.02)
+          .name("ROTATION SPEED");
+        animationFolder
+          .add(params.animation, "enableWobble")
+          .name("ENABLE WOBBLE");
+        animationFolder
+          .add(params.animation, "glitchEffect")
+          .name("GLITCH EFFECT");
+
+        // Helper function to update all materials
+        function updateMaterials() {
+          svgGroup.traverse((child) => {
+            if (child.isMesh) {
+              child.material.color.set(params.material.color);
+              child.material.emissive.set(params.material.emissive);
+              child.material.metalness = params.material.metalness;
+              child.material.roughness = params.material.roughness;
+              child.material.emissiveIntensity =
+                params.material.emissiveIntensity;
+              child.material.needsUpdate = true;
+            }
+          });
+        }
+
+        // Pixelation controls
+        pixelFolder
+          .add(params.pixelation, "enabled")
+          .name("ENABLE PIXELATION")
+          .onChange((value) => {
+            if (value) {
+              composer.addPass(pixelPass);
+            } else {
+              composer.removePass(pixelPass);
+            }
+          });
+
+        pixelFolder
+          .add(params.pixelation, "pixelSize", 1, 16)
+          .step(1)
+          .name("PIXEL SIZE")
+          .onChange((value) => {
+            pixelPass.uniforms.pixelSize.value = Number(value);
+          });
+
+        // Add scanline controls
+        scanlineFolder
+          .add(params.scanline, "enabled")
+          .name("ENABLE SCANLINES")
+          .onChange((value) => {
+            pixelPass.uniforms.scanlineEnabled.value = value;
+          });
+
+        scanlineFolder
+          .add(params.scanline, "intensity", 0, 0.2)
+          .step(0.01)
+          .name("SCANLINE INTENSITY")
+          .onChange((value) => {
+            pixelPass.uniforms.scanlineIntensity.value = value;
+          });
+
+        scanlineFolder
+          .add(params.scanline, "spacing", 0.1, 1.0)
+          .step(0.05)
+          .name("SCANLINE SPACING")
+          .onChange((value) => {
+            pixelPass.uniforms.scanlineSpacing.value = value;
+          });
+
+        // Logo color controls
+        logoColorsFolder
+          .addColor(params.logoColors, "foreground")
+          .name("FOREGROUND COLOR")
+          .onChange((value) => {
+            // Update the foreground color in the shader
+            pixelPass.uniforms.fgColor.value = new THREE.Vector3(
+              ((value >> 16) & 0xff) / 255,
+              ((value >> 8) & 0xff) / 255,
+              (value & 0xff) / 255
+            );
+
+            // Update CSS variable for the static logo
+            document.documentElement.style.setProperty(
+              "--logo-fg-color",
+              "#" + value.toString(16).padStart(6, "0")
+            );
+          });
+
+        logoColorsFolder
+          .addColor(params.logoColors, "background")
+          .name("BACKGROUND COLOR")
+          .onChange((value) => {
+            // Update the background color in the shader
+            pixelPass.uniforms.bgColor.value = new THREE.Vector3(
+              ((value >> 16) & 0xff) / 255,
+              ((value >> 8) & 0xff) / 255,
+              (value & 0xff) / 255
+            );
+
+            // Update CSS variable for the static logo
+            document.documentElement.style.setProperty(
+              "--logo-bg-color",
+              "#" + value.toString(16).padStart(6, "0")
+            );
+          });
+
+        // Add vignette controls for the CSS-based vignette
+        vignetteFolder
+          .add(params.vignette, "enabled")
+          .name("ENABLE VIGNETTE")
+          .onChange((value) => {
+            const crtVignette = document.getElementById("crt-vignette");
+            crtVignette.style.display = value ? "block" : "none";
+          });
+
+        vignetteFolder
+          .add(params.vignette, "strength", 0, 1)
+          .step(0.05)
+          .name("VIGNETTE STRENGTH")
+          .onChange((value) => {
+            const crtVignette = document.getElementById("crt-vignette");
+            // Update the radial-gradient with the new strength value
+            const opacity = 0.3 + value * 0.7; // Scale from 0.3 to 1.0 based on strength
+            crtVignette.style.background = `radial-gradient(ellipse at center, transparent ${
+              50 - value * 25
+            }%, rgba(0, 20, 0, ${opacity}) 100%)`;
+            crtVignette.style.boxShadow = `inset 0 0 ${
+              100 + value * 100
+            }px rgba(0, 50, 0, ${opacity / 2})`;
+          });
+
+        // Open folders by default
+
+        materialFolder.open();
+        animationFolder.open();
+        pixelFolder.open();
+        scanlineFolder.open();
+        vignetteFolder.open();
+        logoColorsFolder.open();
+      });
+
+      // Position camera closer to zoom in on the logo and center it for ZX Spectrum display
+      camera.position.z = 3.5; // Move camera a bit closer
+      camera.fov = 45; // Narrower field of view for closer look
+      camera.position.y = -0.2; // Offset slightly to center in the screen
+      camera.updateProjectionMatrix(); // Update after changing FOV
+
+      // Apply the initial vignette settings
+      const crtVignette = document.getElementById("crt-vignette");
+      if (crtVignette) {
+        const opacity = 0.3 + params.vignette.strength * 0.7;
+        crtVignette.style.display = params.vignette.enabled ? "block" : "none";
+        crtVignette.style.background = `radial-gradient(ellipse at center, transparent ${
+          50 - params.vignette.strength * 25
+        }%, rgba(0, 20, 0, ${opacity}) 100%)`;
+        crtVignette.style.boxShadow = `inset 0 0 ${
+          100 + params.vignette.strength * 100
+        }px rgba(0, 50, 0, ${opacity / 2})`;
+      }
+
+      // Function to create random ZX80-style glitch effect
+      function applyRandomGlitch() {
+        if (!params.animation.glitchEffect) return;
+
+        // Occasionally apply glitch effect (1% chance per frame)
+        if (Math.random() < 0.01) {
+          // Random color shift
+          const glitchColor = new THREE.Color(
+            Math.random() < 0.8 ? 0x00ff00 : 0x00ffff // Occasionally shift color to cyan
+          );
+
+          // Apply to materials
+          globalSvgGroup.traverse((child) => {
+            if (child.isMesh) {
+              child.material.emissive.set(glitchColor);
+              child.material.emissiveIntensity = 0.8 + Math.random() * 0.4;
+            }
+          });
+
+          // Add random position shift
+          globalSvgGroup.position.x = (Math.random() - 0.5) * 0.1;
+
+          // Reset after short delay
+          setTimeout(() => {
+            if (globalSvgGroup) {
+              globalSvgGroup.traverse((child) => {
+                if (child.isMesh) {
+                  child.material.emissive.set(params.material.emissive);
+                  child.material.emissiveIntensity =
+                    params.material.emissiveIntensity;
+                }
+              });
+              globalSvgGroup.position.x = 0;
+            }
+          }, 100 + Math.random() * 200);
+        }
+      }
+
+      // ZX Spectrum loading counter animation
+      let loadingProgress = 0;
+      const progressCounter = document.querySelector(".progress-counter");
+
+      function animateLoading() {
+        // ZX Spectrum style loading progress counter
+        if (loadingProgress < 100) {
+          // Random progress increments like a real ZX Spectrum
+          loadingProgress += Math.floor(Math.random() * 3) + 1;
+          if (loadingProgress > 100) loadingProgress = 100;
+
+          // Update the counter
+          progressCounter.textContent = loadingProgress + "%";
+
+          // When loading reaches 100%, show instructions but keep loading text visible
+          if (loadingProgress === 100) {
+            document.querySelector(".instructions").style.display = "block";
+            // Keep loading text visible as requested
+          }
+        }
+      }
+
+      // Start the loading animation
+      const loadingInterval = setInterval(animateLoading, 200);
+
+      // Function to handle Enter keypress and reveal the 3D logo
+      function revealLogo() {
+        // Add retro screen glitch before hard cut (no modern fades)
+        function createGlitchEffect() {
+          const glitch = document.createElement("div");
+          glitch.className = "screen-glitch";
+          document.body.appendChild(glitch);
+
+          // Apply glitch animation
+          setTimeout(() => {
+            glitch.style.opacity = "1";
+
+            // Hard cut to 3D logo after brief glitch
+            setTimeout(() => {
+              // Hide all ZX Spectrum elements immediately - no fade
+              document.querySelector(".zx-border").style.display = "none";
+              document.querySelector(".logo-placeholder").style.display =
+                "none";
+              document.querySelector(".loading-text").style.display = "none";
+              document.querySelector(".progress-counter").style.display =
+                "none";
+              document.querySelector(".instructions").style.display = "none";
+              glitch.style.display = "none";
+            }, 120);
+          }, 50);
+        }
+
+        // Start the retro glitch transition
+        createGlitchEffect();
+
+        // Stop the loading interval
+        clearInterval(loadingInterval);
+
+        // Make the 3D model visible
+        globalSvgGroup.visible = true;
+
+        // Setup control panel toggle
+        setupControlPanelToggle();
+
+        // Keep yellow on blue colors as requested
+        globalSvgGroup.traverse((child) => {
+          if (child.isMesh) {
+            // Enhance the existing material
+            child.material.emissiveIntensity = 0.7;
+            child.material.needsUpdate = true;
+          }
+        });
+
+        // Setup for a better view of the 3D logo
+        // Position camera for a good view
+        camera.position.set(0, 0, 3.8);
+        camera.fov = 45;
+        camera.updateProjectionMatrix();
+
+        // Better position the model
+        globalSvgGroup.position.y = 0;
+
+        // Function to set up click/tap detection for the control panel after logo is revealed
+        function setupControlPanelToggle() {
+          const guiElement = ampControlPanel;
+
+          // Local function to toggle GUI visibility
+          const toggleLogoGUI = () => {
+            if (guiElement && guiElement.domElement) {
+              guiElement.domElement.style.display =
+                guiElement.domElement.style.display === "none"
+                  ? "block"
+                  : "none";
+            }
+          };
+
+          // Create handlers for click and touch events
+          const handleClick = (e) => {
+            // Only toggle if we're not clicking on the GUI itself
+            const guiElement = document.querySelector(".lil-gui");
+            // Don't toggle if clicking on the GUI panel
+            if (guiElement && !guiElement.contains(e.target)) {
+              toggleLogoGUI();
+            }
+          };
+
+          const handleTouch = (e) => {
+            // Only toggle if we're not touching the GUI itself
+            const guiElement = document.querySelector(".lil-gui");
+
+            // Use changedTouches for touchend event
+            if (e.changedTouches && e.changedTouches.length > 0) {
+              const touch = e.changedTouches[0];
+              const touchTarget = document.elementFromPoint(
+                touch.clientX,
+                touch.clientY
+              );
+
+              // Don't toggle if touching the GUI panel
+              if (guiElement && !guiElement.contains(touchTarget)) {
+                toggleLogoGUI();
+                // Prevent default only when we handle the event
+                e.preventDefault();
+              }
+            }
+          };
+
+          // Add event listeners to the document body
+          document.body.addEventListener("click", handleClick);
+          document.body.addEventListener("touchend", handleTouch);
+        }
+
+        // Add some camera animation
+        const startCameraZ = camera.position.z;
+        const cameraAnimation = () => {
+          camera.position.z =
+            startCameraZ + Math.sin(Date.now() * 0.0005) * 0.3;
+          camera.updateProjectionMatrix();
+          requestAnimationFrame(cameraAnimation);
+        };
+        cameraAnimation();
+      }
+
+      // Check if device is touch-enabled
+      const isTouchDevice = "ontouchstart" in window;
+
+      // Show appropriate instructions based on device type
+      if (isTouchDevice) {
+        const desktopInstructions = document.querySelector(
+          ".desktop-instructions"
+        );
+        const mobileInstructions = document.querySelector(
+          ".mobile-instructions"
+        );
+        if (desktopInstructions && mobileInstructions) {
+          desktopInstructions.style.display = "none";
+          mobileInstructions.style.display = "inline";
+        }
+      }
+
+      // Add event listeners for both Enter key and touch
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          revealLogo();
+        }
+      });
+
+      // Add touch event for mobile devices - only for initial reveal
+      // Using touchend so it's consistent with the GUI toggle event
+      document.addEventListener("touchend", (e) => {
+        // Only trigger if loading is complete (instructions are visible)
+        if (
+          document.querySelector(".instructions").style.display === "block" &&
+          (!globalSvgGroup || !globalSvgGroup.visible)
+        ) {
+          revealLogo();
+          // Prevent default to avoid any conflicts
+          e.preventDefault();
+        }
+      });
+
+      function animate() {
+        if (globalSvgGroup) {
+          // Rotate around Y axis at configurable speed
+          globalSvgGroup.rotation.y += params.animation.rotationSpeed;
+
+          // Add subtle wobble rotation if enabled
+          if (params.animation.enableWobble) {
+            globalSvgGroup.rotation.x = Math.sin(Date.now() * 0.0005) * 0.1;
+            globalSvgGroup.rotation.z = Math.cos(Date.now() * 0.0003) * 0.05;
+          }
+
+          // Apply random glitch effects
+          applyRandomGlitch();
+        }
+
+        // Use effect composer for rendering with bloom if available, otherwise fallback to renderer
+        if (globalComposer) {
+          globalComposer.render();
+        } else {
+          renderer.render(scene, camera);
+        }
+      }
+
+      // Handle window resize
+      window.addEventListener("resize", function () {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        // Update camera
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+
+        // Update renderer
+        renderer.setSize(width, height);
+
+        // Update composer if it exists
+        if (globalComposer) {
+          globalComposer.setSize(width, height);
+
+          // Update pixelation shader if it exists
+          const pixelPass = globalComposer.passes.find(
+            (pass) => pass.uniforms && pass.uniforms.pixelSize
+          );
+          if (pixelPass && pixelPass.uniforms) {
+            pixelPass.uniforms.resolution.value.set(width, height);
+          }
+        }
+      });
+
+      renderer.setAnimationLoop(animate);
+    </script>
+  </body>
 </html>
