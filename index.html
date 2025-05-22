@@ -305,7 +305,7 @@
 
 <body>
 	<div class="scanline"></div>
-	<div class="crt-effect"></div>
+	<div class="crt-effect" id="crt-vignette"></div>
 	<div class="zx-border">
 		<div class="border-stripes"></div>
 	</div>
@@ -344,15 +344,19 @@
 		resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
 		pixelSize: { value: 8.0 },
 		zxMode: { value: true }, // Enable ZX Spectrum mode
-		 fgColor: { value: new THREE.Vector3(1.0, 1.0, 0.0) }, // Yellow foreground
-			bgColor: { value: new THREE.Vector3(0.0, 0.0, 1.0) }  // Blue background
-		},
+		fgColor: { value: new THREE.Vector3(1.0, 1.0, 0.0) }, // Yellow foreground
+		bgColor: { value: new THREE.Vector3(0.0, 0.0, 1.0) },  // Blue background
+		 vinStrength: { value: 0.5 }, // Vignette strength
+		vinEnabled: { value: true } // Vignette enabled
+	},
 
 			vertexShader: /* glsl */ `
 				varying vec2 vUv;
+				varying vec2 vPosition;
 				
 				void main() {
 					vUv = uv;
+					vPosition = position.xy;
 					gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 				}
 			`,
@@ -365,10 +369,11 @@
 			uniform float scanlineSpacing;
 			uniform bool scanlineEnabled;
 			uniform bool zxMode;
-		uniform vec3 fgColor;
-		uniform vec3 bgColor;
+			uniform vec3 fgColor;
+			uniform vec3 bgColor;
 			
 			varying vec2 vUv;
+			varying vec2 vPosition;
 			
 			// ZX Spectrum has a very limited palette of just 8 colors
 			vec3 zxColorPalette(vec3 color) {
@@ -405,6 +410,8 @@
 			 vec2 dxy = pixelSize / resolution;
 			 vec2 coord = dxy * floor(vUv / dxy);
 			 gl_FragColor = texture2D(tDiffuse, coord);
+			
+			// Vignette is now handled in CSS via the crt-effect div
 			
 			// For ZX Spectrum mode
 			if (zxMode) {
@@ -499,12 +506,17 @@
 		spacing: 1.0,
 		enabled: true
 		},
-		 // Logo colors
-		logoColors: {
-			foreground: 0xffff00, // Yellow foreground
-			background: 0x0000ff  // Blue background
-		}
-	};
+		// Vignette parameters
+		vignette: {
+		strength: 0.5,
+		enabled: true
+		},
+	// Logo colors
+	logoColors: {
+		foreground: 0xffff00, // Yellow foreground
+		background: 0x0000ff  // Blue background
+	}
+};
 
 		// Load the SVG
 		const loader = new SVGLoader();
@@ -715,6 +727,7 @@
 			const animationFolder = gui.addFolder('ANIMATION');
 			const pixelFolder = gui.addFolder('ZX80 PIXELATION');
 			const scanlineFolder = gui.addFolder('SCANLINE EFFECT');
+			const vignetteFolder = gui.addFolder('VIGNETTE EFFECT');
 			const logoColorsFolder = gui.addFolder('LOGO COLORS');
 
 			// Bloom controls removed for ZX80 style
@@ -797,12 +810,27 @@
 				document.documentElement.style.setProperty('--logo-bg-color', '#' + value.toString(16).padStart(6, '0'));
 			});
 
+			// Add vignette controls for the CSS-based vignette
+			vignetteFolder.add(params.vignette, 'enabled').name('ENABLE VIGNETTE').onChange(value => {
+				const crtVignette = document.getElementById('crt-vignette');
+				crtVignette.style.display = value ? 'block' : 'none';
+			});
+
+			vignetteFolder.add(params.vignette, 'strength', 0, 1).step(0.05).name('VIGNETTE STRENGTH').onChange(value => {
+				const crtVignette = document.getElementById('crt-vignette');
+				// Update the radial-gradient with the new strength value
+				const opacity = 0.3 + (value * 0.7); // Scale from 0.3 to 1.0 based on strength
+				crtVignette.style.background = `radial-gradient(ellipse at center, transparent ${50 - value * 25}%, rgba(0, 20, 0, ${opacity}) 100%)`;
+				crtVignette.style.boxShadow = `inset 0 0 ${100 + value * 100}px rgba(0, 50, 0, ${opacity/2})`;
+			});
+
 			// Open folders by default
 			// bloomFolder.open(); // Removed bloom folder
 			materialFolder.open();
 			animationFolder.open();
 			pixelFolder.open();
 			scanlineFolder.open();
+			vignetteFolder.open();
 			logoColorsFolder.open();
 		});
 
@@ -811,6 +839,15 @@
 		camera.fov = 45; // Narrower field of view for closer look
 		camera.position.y = -0.2; // Offset slightly to center in the screen
 		camera.updateProjectionMatrix(); // Update after changing FOV
+		
+		// Apply the initial vignette settings
+		const crtVignette = document.getElementById('crt-vignette');
+		if (crtVignette) {
+			const opacity = 0.3 + (params.vignette.strength * 0.7);
+			crtVignette.style.display = params.vignette.enabled ? 'block' : 'none';
+			crtVignette.style.background = `radial-gradient(ellipse at center, transparent ${50 - params.vignette.strength * 25}%, rgba(0, 20, 0, ${opacity}) 100%)`;
+			crtVignette.style.boxShadow = `inset 0 0 ${100 + params.vignette.strength * 100}px rgba(0, 50, 0, ${opacity/2})`;
+		}
 
 		// Function to create random ZX80-style glitch effect
 		function applyRandomGlitch() {
