@@ -11,6 +11,8 @@ The various [Amp](https://ampcode.com/) threads used to bring this to life:
 * https://ampcode.com/threads/T-756c62ba-a636-4a74-9171-0e38c9453612
 * https://ampcode.com/threads/T-4741dc96-f412-4414-959c-ee8abecb9678
 
+Also see the [commit log](https://github.com/toolmantim/zx-amp/commits/main/) to see Amp threads referenced in the commit messages.
+
 ## Developing
 
 * Install Amp in VS Code
