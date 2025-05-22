@@ -1034,22 +1034,27 @@
 
 		// Handle window resize
 		window.addEventListener('resize', function () {
-			const width = window.innerWidth;
-			const height = window.innerHeight;
+		const width = window.innerWidth;
+		const height = window.innerHeight;
 
-			// Update camera
-			camera.aspect = width / height;
-			camera.updateProjectionMatrix();
+		// Update camera
+		camera.aspect = width / height;
+		camera.updateProjectionMatrix();
 
-			// Update renderer
-			renderer.setSize(width, height);
-			composer.setSize(width, height);
-
-			// Update pixelation shader
+		// Update renderer
+		renderer.setSize(width, height);
+		
+		// Update composer if it exists
+		if (window.composer) {
+		 window.composer.setSize(width, height);
+		
+		 // Update pixelation shader if it exists
+		  const pixelPass = window.composer.passes.find(pass => pass.uniforms && pass.uniforms.pixelSize);
 			if (pixelPass && pixelPass.uniforms) {
 				pixelPass.uniforms.resolution.value.set(width, height);
 			}
-		});
+		}
+	});
 
 		renderer.setAnimationLoop(animate);
 	</script>
