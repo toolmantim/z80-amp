@@ -312,8 +312,10 @@
 	<div class="logo-placeholder">AMP</div>
 	<div class="loading-text">LOADING ZX80 AMP...</div>
 	<div class="progress-counter">0%</div>
-	<div class="instructions" style="display: none;"><span class="desktop-instructions">PRESS ENTER TO CONTINUE</span><span class="mobile-instructions" style="display: none;">TAP TO CONTINUE</span></div>
-
+	<div class="instructions" style="display: none;">
+		<span class="desktop-instructions">PRESS ENTER TO CONTINUE</span>
+		<span class="mobile-instructions" style="display: none;">TAP TO CONTINUE</span>
+	</div>
 
 	<script type="module">
 		import * as THREE from 'three';
@@ -324,7 +326,7 @@
 		import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 		import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-		
+
 		// Initialize CSS variables for logo colors
 		document.documentElement.style.setProperty('--logo-fg-color', '#ffff00'); // Default yellow
 		document.documentElement.style.setProperty('--logo-bg-color', '#0000ff'); // Default blue
@@ -339,16 +341,16 @@
 
 		// Define pixelation shader with ZX Spectrum limitations
 		const PixelShader = {
-		uniforms: {
-		tDiffuse: { value: null },
-		resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-		pixelSize: { value: 8.0 },
-		zxMode: { value: true }, // Enable ZX Spectrum mode
-		fgColor: { value: new THREE.Vector3(1.0, 1.0, 0.0) }, // Yellow foreground
-		bgColor: { value: new THREE.Vector3(0.0, 0.0, 1.0) },  // Blue background
-		 vinStrength: { value: 0.5 }, // Vignette strength
-		vinEnabled: { value: true } // Vignette enabled
-	},
+			uniforms: {
+				tDiffuse: { value: null },
+				resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+				pixelSize: { value: 8.0 },
+				zxMode: { value: true }, // Enable ZX Spectrum mode
+				fgColor: { value: new THREE.Vector3(1.0, 1.0, 0.0) }, // Yellow foreground
+				bgColor: { value: new THREE.Vector3(0.0, 0.0, 1.0) },  // Blue background
+				vinStrength: { value: 0.5 }, // Vignette strength
+				vinEnabled: { value: true } // Vignette enabled
+			},
 
 			vertexShader: /* glsl */ `
 				varying vec2 vUv;
@@ -474,49 +476,49 @@
 
 		// Define adjustable parameters globally so they're available everywhere
 		const params = {
-		// Bloom parameters
-		bloom: {
-		threshold: 0,
-		strength: 1.0,
-		radius: 0.4,
-		exposure: 1
-		},
-		// Material parameters
-		material: {
-		color: 0xffffff, // Bright white for ZX Spectrum mode
-		metalness: 0, // Remove metalness to eliminate reflections
-		roughness: 0.2, // Lower roughness for more visibility
-		emissive: 0xffffff, // White glow
-		emissiveIntensity: 1.0
-		},
-		// Animation parameters
-		animation: {
-		rotationSpeed: 0.003,
-		enableWobble: true,
-		glitchEffect: true
-		},
-		// Pixelation parameters
-		pixelation: {
-		pixelSize: 6,
-		enabled: true
-		},
-		// Scanline parameters
-		scanline: {
-		intensity: 0.2,
-		spacing: 1.0,
-		enabled: true
-		},
-		// Vignette parameters
-		vignette: {
-		strength: 0.5,
-		enabled: true
-		},
-	// Logo colors
-	logoColors: {
-		foreground: 0xffff00, // Yellow foreground
-		background: 0x0000ff  // Blue background
-	}
-};
+			// Bloom parameters
+			bloom: {
+				threshold: 0,
+				strength: 1.0,
+				radius: 0.4,
+				exposure: 1
+			},
+			// Material parameters
+			material: {
+				color: 0xffffff, // Bright white for ZX Spectrum mode
+				metalness: 0, // Remove metalness to eliminate reflections
+				roughness: 0.2, // Lower roughness for more visibility
+				emissive: 0xffffff, // White glow
+				emissiveIntensity: 1.0
+			},
+			// Animation parameters
+			animation: {
+				rotationSpeed: 0.003,
+				enableWobble: true,
+				glitchEffect: true
+			},
+			// Pixelation parameters
+			pixelation: {
+				pixelSize: 6,
+				enabled: true
+			},
+			// Scanline parameters
+			scanline: {
+				intensity: 0.2,
+				spacing: 1.0,
+				enabled: true
+			},
+			// Vignette parameters
+			vignette: {
+				strength: 0.5,
+				enabled: true
+			},
+			// Logo colors
+			logoColors: {
+				foreground: 0xffff00, // Yellow foreground
+				background: 0x0000ff  // Blue background
+			}
+		};
 
 		// Load the SVG
 		const loader = new SVGLoader();
@@ -623,17 +625,17 @@
 			pixelPass.uniforms.scanlineSpacing = { value: params.scanline.spacing };
 			pixelPass.uniforms.scanlineEnabled = { value: params.scanline.enabled };
 			pixelPass.uniforms.zxMode = { value: true };
-		// Set the initial colors from our params
-		pixelPass.uniforms.fgColor.value = new THREE.Vector3(
-			((params.logoColors.foreground >> 16) & 0xff) / 255,
-			((params.logoColors.foreground >> 8) & 0xff) / 255,
-			(params.logoColors.foreground & 0xff) / 255
-		);
-		pixelPass.uniforms.bgColor.value = new THREE.Vector3(
-			((params.logoColors.background >> 16) & 0xff) / 255,
-			((params.logoColors.background >> 8) & 0xff) / 255,
-			(params.logoColors.background & 0xff) / 255
-		);
+			// Set the initial colors from our params
+			pixelPass.uniforms.fgColor.value = new THREE.Vector3(
+				((params.logoColors.foreground >> 16) & 0xff) / 255,
+				((params.logoColors.foreground >> 8) & 0xff) / 255,
+				(params.logoColors.foreground & 0xff) / 255
+			);
+			pixelPass.uniforms.bgColor.value = new THREE.Vector3(
+				((params.logoColors.background >> 16) & 0xff) / 255,
+				((params.logoColors.background >> 8) & 0xff) / 255,
+				(params.logoColors.background & 0xff) / 255
+			);
 
 			const bloomPass = new UnrealBloomPass(
 				new THREE.Vector2(window.innerWidth, window.innerHeight)
@@ -679,7 +681,7 @@
 			gui.domElement.style.right = '20px';
 			gui.domElement.style.top = '20px';
 			gui.domElement.style.display = 'none';
-			
+
 			// Store GUI in a global variable for access from 3D logo interaction
 			window.ampControlPanel = gui;
 
@@ -789,7 +791,7 @@
 					((value >> 8) & 0xff) / 255,
 					(value & 0xff) / 255
 				);
-				
+
 				// Update CSS variable for the static logo
 				document.documentElement.style.setProperty('--logo-fg-color', '#' + value.toString(16).padStart(6, '0'));
 			});
@@ -801,7 +803,7 @@
 					((value >> 8) & 0xff) / 255,
 					(value & 0xff) / 255
 				);
-				
+
 				// Update CSS variable for the static logo
 				document.documentElement.style.setProperty('--logo-bg-color', '#' + value.toString(16).padStart(6, '0'));
 			});
@@ -817,7 +819,7 @@
 				// Update the radial-gradient with the new strength value
 				const opacity = 0.3 + (value * 0.7); // Scale from 0.3 to 1.0 based on strength
 				crtVignette.style.background = `radial-gradient(ellipse at center, transparent ${50 - value * 25}%, rgba(0, 20, 0, ${opacity}) 100%)`;
-				crtVignette.style.boxShadow = `inset 0 0 ${100 + value * 100}px rgba(0, 50, 0, ${opacity/2})`;
+				crtVignette.style.boxShadow = `inset 0 0 ${100 + value * 100}px rgba(0, 50, 0, ${opacity / 2})`;
 			});
 
 			// Open folders by default
@@ -835,14 +837,14 @@
 		camera.fov = 45; // Narrower field of view for closer look
 		camera.position.y = -0.2; // Offset slightly to center in the screen
 		camera.updateProjectionMatrix(); // Update after changing FOV
-		
+
 		// Apply the initial vignette settings
 		const crtVignette = document.getElementById('crt-vignette');
 		if (crtVignette) {
 			const opacity = 0.3 + (params.vignette.strength * 0.7);
 			crtVignette.style.display = params.vignette.enabled ? 'block' : 'none';
 			crtVignette.style.background = `radial-gradient(ellipse at center, transparent ${50 - params.vignette.strength * 25}%, rgba(0, 20, 0, ${opacity}) 100%)`;
-			crtVignette.style.boxShadow = `inset 0 0 ${100 + params.vignette.strength * 100}px rgba(0, 50, 0, ${opacity/2})`;
+			crtVignette.style.boxShadow = `inset 0 0 ${100 + params.vignette.strength * 100}px rgba(0, 50, 0, ${opacity / 2})`;
 		}
 
 		// Function to create random ZX80-style glitch effect
@@ -908,7 +910,7 @@
 
 		// Start the loading animation
 		const loadingInterval = setInterval(animateLoading, 200);
-		
+
 		// Long press functionality removed for placeholder logo
 
 		// Function to handle Enter keypress and reveal the 3D logo
@@ -947,7 +949,7 @@
 
 			// Make the 3D model visible
 			window.svgGroup.visible = true;
-			
+
 			// Set up the event handlers for showing the GUI
 			setupControlPanelToggle();
 
@@ -968,21 +970,21 @@
 
 			// Better position the model
 			window.svgGroup.position.y = 0;
-			
+
 			// Function to set up click/tap detection for the control panel after logo is revealed
 			function setupControlPanelToggle() {
 				// Reference the GUI by variable name from outer scope
 				// Use window to make sure we access the globally defined gui
 				const guiElement = window.ampControlPanel;
-				
+
 				// Local function to toggle GUI visibility
 				const toggleLogoGUI = () => {
 					if (guiElement && guiElement.domElement) {
-						guiElement.domElement.style.display = 
+						guiElement.domElement.style.display =
 							guiElement.domElement.style.display === 'none' ? 'block' : 'none';
 					}
 				};
-				
+
 				// Create handlers for click and touch events
 				const handleClick = (e) => {
 					// Only toggle if we're not clicking on the GUI itself
@@ -992,16 +994,16 @@
 						toggleLogoGUI();
 					}
 				};
-				
+
 				const handleTouch = (e) => {
 					// Only toggle if we're not touching the GUI itself
 					const guiElement = document.querySelector('.lil-gui');
-					
+
 					// Use changedTouches for touchend event
 					if (e.changedTouches && e.changedTouches.length > 0) {
 						const touch = e.changedTouches[0];
 						const touchTarget = document.elementFromPoint(touch.clientX, touch.clientY);
-						
+
 						// Don't toggle if touching the GUI panel
 						if (guiElement && !guiElement.contains(touchTarget)) {
 							toggleLogoGUI();
@@ -1010,7 +1012,7 @@
 						}
 					}
 				};
-				
+
 				// Add event listeners to the document body
 				document.body.addEventListener('click', handleClick);
 				document.body.addEventListener('touchend', handleTouch);
@@ -1031,7 +1033,7 @@
 
 		// Check if device is touch-enabled
 		const isTouchDevice = 'ontouchstart' in window;
-		
+
 		// Show appropriate instructions based on device type
 		if (isTouchDevice) {
 			const desktopInstructions = document.querySelector('.desktop-instructions');
@@ -1048,19 +1050,19 @@
 				revealLogo();
 			}
 		});
-		
+
 		// Add touch event for mobile devices - only for initial reveal
 		// Using touchend so it's consistent with the GUI toggle event
 		document.addEventListener('touchend', (e) => {
-		// Only trigger if loading is complete (instructions are visible)
-		if (document.querySelector('.instructions').style.display === 'block' && 
-		(!window.svgGroup || !window.svgGroup.visible)) {
-		 revealLogo();
-		  // Prevent default to avoid any conflicts
-			e.preventDefault();
-		}
-	});
-	
+			// Only trigger if loading is complete (instructions are visible)
+			if (document.querySelector('.instructions').style.display === 'block' &&
+				(!window.svgGroup || !window.svgGroup.visible)) {
+				revealLogo();
+				// Prevent default to avoid any conflicts
+				e.preventDefault();
+			}
+		});
+
 
 
 		function animate() {
@@ -1088,27 +1090,27 @@
 
 		// Handle window resize
 		window.addEventListener('resize', function () {
-		const width = window.innerWidth;
-		const height = window.innerHeight;
+			const width = window.innerWidth;
+			const height = window.innerHeight;
 
-		// Update camera
-		camera.aspect = width / height;
-		camera.updateProjectionMatrix();
+			// Update camera
+			camera.aspect = width / height;
+			camera.updateProjectionMatrix();
 
-		// Update renderer
-		renderer.setSize(width, height);
-		
-		// Update composer if it exists
-		if (window.composer) {
-		 window.composer.setSize(width, height);
-		
-		 // Update pixelation shader if it exists
-		  const pixelPass = window.composer.passes.find(pass => pass.uniforms && pass.uniforms.pixelSize);
-			if (pixelPass && pixelPass.uniforms) {
-				pixelPass.uniforms.resolution.value.set(width, height);
+			// Update renderer
+			renderer.setSize(width, height);
+
+			// Update composer if it exists
+			if (window.composer) {
+				window.composer.setSize(width, height);
+
+				// Update pixelation shader if it exists
+				const pixelPass = window.composer.passes.find(pass => pass.uniforms && pass.uniforms.pixelSize);
+				if (pixelPass && pixelPass.uniforms) {
+					pixelPass.uniforms.resolution.value.set(width, height);
+				}
 			}
-		}
-	});
+		});
 
 		renderer.setAnimationLoop(animate);
 	</script>
