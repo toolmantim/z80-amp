@@ -10,3 +10,12 @@ The various [Amp](https://ampcode.com/) threads used to bring this to life:
 * https://ampcode.com/threads/T-ef2b579c-22c1-4dc7-b1d4-befb8ca2cd67
 * https://ampcode.com/threads/T-756c62ba-a636-4a74-9171-0e38c9453612
 * https://ampcode.com/threads/T-4741dc96-f412-4414-959c-ee8abecb9678
+
+## Developing
+
+* Install Amp in VS Code
+* Open index.html
+* Start the Live Preview server (cmd-shift-p "live preview")
+* Type words into Amp
+
+![Screenshot of dev environment](screenshot.png)
