@@ -679,13 +679,9 @@
 			gui.domElement.style.right = '20px';
 			gui.domElement.style.top = '20px';
 			gui.domElement.style.display = 'none';
-
-			// Toggle GUI with 'g' key (only works after the loading screen has been cleared)
-			document.addEventListener('keydown', (event) => {
-				if ((event.key === 'g' || event.key === 'G') && document.querySelector('.logo-placeholder').style.display === 'none') {
-					gui.domElement.style.display = gui.domElement.style.display === 'none' ? 'block' : 'none';
-				}
-			});
+			
+			// Store GUI in a global variable for access from 3D logo interaction
+			window.ampControlPanel = gui;
 
 			// Apply ZX80 style to GUI
 			const guiElement = document.querySelector('.lil-gui');
@@ -912,6 +908,8 @@
 
 		// Start the loading animation
 		const loadingInterval = setInterval(animateLoading, 200);
+		
+		// Long press functionality removed for placeholder logo
 
 		// Function to handle Enter keypress and reveal the 3D logo
 		function revealLogo() {
@@ -949,6 +947,9 @@
 
 			// Make the 3D model visible
 			window.svgGroup.visible = true;
+			
+			// Set up long press detection on the 3D model
+			setupLongPressOn3DLogo();
 
 			// Keep yellow on blue colors as requested
 			window.svgGroup.traverse((child) => {
@@ -967,6 +968,56 @@
 
 			// Better position the model
 			window.svgGroup.position.y = 0;
+			
+			// Function to add click/tap detection to the entire document
+			function setupLongPressOn3DLogo() {
+				// Reference the GUI by variable name from outer scope
+				// Use window to make sure we access the globally defined gui
+				const guiElement = window.ampControlPanel;
+				
+				// Local function to toggle GUI visibility
+				const toggleLogoGUI = () => {
+					if (guiElement && guiElement.domElement) {
+						guiElement.domElement.style.display = 
+							guiElement.domElement.style.display === 'none' ? 'block' : 'none';
+					}
+				};
+				
+				// Add event listeners to the document body to expand click area
+				document.body.addEventListener('click', (e) => {
+					// Check if the 3D logo is already visible
+					if (window.svgGroup && window.svgGroup.visible) {
+						// Only toggle if we're not clicking on the GUI itself
+						const guiElement = document.querySelector('.lil-gui');
+						// Don't toggle if clicking on the GUI panel
+						if (guiElement && !guiElement.contains(e.target)) {
+							toggleLogoGUI();
+						}
+					}
+				});
+				
+				// Touch events for mobile
+				document.body.addEventListener('touchend', (e) => {
+					// Check if the 3D logo is already visible
+					if (window.svgGroup && window.svgGroup.visible) {
+						// Only toggle if we're not touching the GUI itself
+						const guiElement = document.querySelector('.lil-gui');
+						
+						// Use changedTouches for touchend event
+						if (e.changedTouches && e.changedTouches.length > 0) {
+							const touch = e.changedTouches[0];
+							const touchTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+							
+							// Don't toggle if touching the GUI panel
+							if (guiElement && !guiElement.contains(touchTarget)) {
+								toggleLogoGUI();
+								// Prevent default only when we handle the event
+								e.preventDefault();
+							}
+						}
+					}
+				});
+			}
 
 			// Add some camera animation
 			const startCameraZ = camera.position.z;
